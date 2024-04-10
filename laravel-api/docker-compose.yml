@@ -23,6 +23,7 @@ services:
             POSTGRES_PASSWORD: ${DB_PASSWORD}
         volumes:
             - cfp-test-pgsql:/var/lib/postgresql/data
+            - ./docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/create-testing-database.sql'
         networks:
             - cfp-network
 
