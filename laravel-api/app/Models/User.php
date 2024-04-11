@@ -22,6 +22,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string $first_name
  * @property string $last_name
  * @property string $email
+ * @property string|null $birthday
  * @property Carbon|null $email_verified_at
  * @property string|null $mobile
  * @property string $username
@@ -37,6 +38,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder|User newModelQuery()
  * @method static Builder|User newQuery()
  * @method static Builder|User query()
+ * @method static Builder|User whereBirthday($value)
  * @method static Builder|User whereCreatedAt($value)
  * @method static Builder|User whereEmail($value)
  * @method static Builder|User whereEmailVerifiedAt($value)
