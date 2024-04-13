@@ -58,6 +58,6 @@ it('validate the request input', function (array $requestData) {
     $res->assertUnprocessable();
 
     $missingFields = array_keys($res->getOriginalContent()['errors']);
-    expect($missingFields)->toMatchArray($requestData['expect_missing']);
+    expect($missingFields)->toEqualCanonicalizing($requestData['expect_missing']);
 })
     ->with('invalid_user_data');
