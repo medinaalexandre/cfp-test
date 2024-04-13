@@ -18,7 +18,7 @@ class LoginController extends Controller
             ->orWhere('username', '=', $request->getUsername())
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'wrong credentials'], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -27,7 +27,7 @@ class LoginController extends Controller
             'password' => $request->getPassword(),
         ];
 
-        if (!Auth::attempt($credentials, true)) {
+        if (! Auth::attempt($credentials, true)) {
             return response()->json(['message' => 'wrong credentials'], Response::HTTP_UNAUTHORIZED);
         }
 

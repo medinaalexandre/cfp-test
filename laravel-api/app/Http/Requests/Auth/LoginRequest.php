@@ -12,7 +12,7 @@ class LoginRequest extends FormRequest
             'email' => 'required_if:username,null|email',
             'username' => 'required_if:email,null|string',
             'password' => 'required',
-            'mobile' => 'string|nullable'
+            'mobile' => 'string|nullable',
         ];
     }
 

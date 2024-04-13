@@ -1,6 +1,5 @@
 <?php
 
-
 use App\Models\User;
 use Illuminate\Testing\TestResponse;
 
@@ -28,7 +27,7 @@ it('can list the users', function () {
         ->assertJsonStructure([
             'data',
             'links',
-            'meta'
+            'meta',
         ])
         ->assertJsonPath('meta.total', User::count());
 });
@@ -37,7 +36,7 @@ it('can get a single user', function () {
     $user = User::factory()->create();
 
     /** @var TestResponse $res */
-    $res = $this->get('/api/users/' . $user->getKey());
+    $res = $this->get('/api/users/'.$user->getKey());
     $res->assertOk()
         ->assertJsonMissingPath('data.password')
         ->assertJsonPath('data.id', $user->getKey());

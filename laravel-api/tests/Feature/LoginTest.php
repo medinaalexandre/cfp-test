@@ -9,29 +9,29 @@ beforeEach(function () {
     $this->user = User::factory()->create([
         'username' => $this->username,
         'email' => $this->email,
-        'password' => Hash::make($this->password)
+        'password' => Hash::make($this->password),
     ]);
 });
 
 it('can login with valid username and password', function () {
-   $this->postJson('/api/login', [
+    $this->postJson('/api/login', [
         'username' => $this->username,
         'password' => $this->password,
     ])->assertOk()
-       ->assertCookie('auth_token');;
+        ->assertCookie('auth_token');
 });
 
 it('can login with valid email and password', function () {
-   $this->postJson('/api/login', [
+    $this->postJson('/api/login', [
         'email' => $this->email,
         'password' => $this->password,
     ])->assertOk()
-       ->assertCookie('auth_token');
+        ->assertCookie('auth_token');
 });
 
 it('receive unauthorized when gives wrong credentials', function () {
     $this->postJson('/api/login', [
         'email' => $this->email,
-        'password' => $this->password . 'WRONG',
+        'password' => $this->password.'WRONG',
     ])->assertUnauthorized();
 });
