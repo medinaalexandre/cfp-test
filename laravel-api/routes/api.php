@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\User\UserCreateController;
 use App\Http\Controllers\User\UserListController;
 use App\Http\Controllers\User\UserViewController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,10 +17,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::post('/login', LoginController::class);
 
-Route::get('/users', UserListController::class);
-Route::post('/users', UserCreateController::class);
-Route::get('/users/{user}', UserViewController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/users', UserListController::class);
+    Route::post('/users', UserCreateController::class);
+    Route::get('/users/{user}', UserViewController::class);
+});

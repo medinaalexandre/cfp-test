@@ -7,7 +7,7 @@ dataset('invalid_user_data', [
             'email' => fake()->email,
             'username' => fake()->userName,
             'birthday' => fake()->date,
-            'password' => fake()->password(20)
+            'password' => Str::password(20)
         ],
         'expect_missing' => [
             'last_name'
@@ -19,7 +19,7 @@ dataset('invalid_user_data', [
             'email' => fake()->email,
             'username' => fake()->userName,
             'birthday' => fake()->date,
-            'password' => fake()->password(20)
+            'password' => Str::password(20)
         ],
         'expect_missing' => [
             'first_name'
@@ -31,7 +31,7 @@ dataset('invalid_user_data', [
             'last_name' => fake()->lastName,
             'username' => fake()->userName,
             'birthday' => fake()->date,
-            'password' => fake()->password(20)
+            'password' => Str::password(20)
         ],
         'expect_missing' => [
             'email'
@@ -42,7 +42,7 @@ dataset('invalid_user_data', [
             'first_name' => fake()->firstName,
             'last_name' => fake()->lastName,
             'email' => fake()->email,
-            'password' => fake()->password(20)
+            'password' => Str::password(20)
         ],
         'expect_missing' => [
             'username'

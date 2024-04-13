@@ -4,6 +4,10 @@
 use App\Models\User;
 use Illuminate\Testing\TestResponse;
 
+beforeEach(function () {
+    $this->actingAs(User::factory()->create());
+});
+
 it('validate the request on create', function (array $requestData) {
     /** @var TestResponse $res */
     $res = $this->postJson('/api/users', $requestData['data']);
@@ -26,7 +30,7 @@ it('can list the users', function () {
             'links',
             'meta'
         ])
-        ->assertJsonPath('meta.total', 40);
+        ->assertJsonPath('meta.total', User::count());
 });
 
 it('can get a single user', function () {
