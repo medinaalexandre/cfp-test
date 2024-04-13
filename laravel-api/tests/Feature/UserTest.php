@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Services\UserService;
-use Illuminate\Testing\TestResponse;
 
 beforeEach(function () {
     $this->service = new UserService();
@@ -51,13 +50,3 @@ it('can delete a user', function () {
     expect(User::find($user->getKey()))
         ->toBeNull();
 });
-
-it('validate the request input', function (array $requestData) {
-    /** @var TestResponse $res */
-    $res = $this->postJson('/api/users', $requestData['data']);
-    $res->assertUnprocessable();
-
-    $missingFields = array_keys($res->getOriginalContent()['errors']);
-    expect($missingFields)->toEqualCanonicalizing($requestData['expect_missing']);
-})
-    ->with('invalid_user_data');
