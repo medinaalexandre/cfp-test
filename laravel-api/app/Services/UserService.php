@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Hash;
 
 class UserService
 {
@@ -14,7 +15,7 @@ class UserService
             $user[$key] = $value;
         }
 
-        $user->password = \Hash::make($user->password);
+        $user->password = Hash::make($user->password);
 
         return tap($user)->save();
     }
@@ -26,7 +27,7 @@ class UserService
         }
 
         if (isset($data['password'])) {
-            $user->password = \Hash::make($data['password']);
+            $user->password = Hash::make($data['password']);
         }
 
         return tap($user)->save();

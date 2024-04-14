@@ -7,9 +7,11 @@ beforeEach(function () {
     $this->username = 'foobar';
     $this->email = 'foo@bar.com';
     $this->user = User::factory()->create([
-        'username' => $this->username,
-        'email' => $this->email,
-        'password' => Hash::make($this->password),
+        'first_name' => 'alexandre',
+        'last_name' => 'medina',
+        'username' => 'medina',
+        'email' => 'medina@cfp.com',
+        'password' => Hash::make('P@ssw0rd'),
     ]);
 });
 
