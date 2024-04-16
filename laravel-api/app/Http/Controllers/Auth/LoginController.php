@@ -31,7 +31,7 @@ class LoginController extends Controller
             return response()->json(['message' => 'wrong credentials'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $token = $user->createToken($request->getMobile() ?? 'authToken')->plainTextToken;
+        $token = $user->createToken($request->getDeviceName() ?? 'authToken')->plainTextToken;
         $cookie = cookie('auth_token', $token, 60 * 24 * 7);
 
         return response()->json()->withCookie($cookie);

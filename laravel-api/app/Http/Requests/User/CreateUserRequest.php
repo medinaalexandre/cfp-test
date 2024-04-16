@@ -17,6 +17,7 @@ class CreateUserRequest extends FormRequest
             'email' => 'required|email|unique:users,email',
             'username' => $stringRule,
             'birthday' => 'nullable|sometimes|date',
+            'mobile' => 'nullable|string',
             'password' => ['required', Password::defaults()],
         ];
     }

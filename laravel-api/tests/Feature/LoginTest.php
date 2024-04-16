@@ -9,9 +9,9 @@ beforeEach(function () {
     $this->user = User::factory()->create([
         'first_name' => 'alexandre',
         'last_name' => 'medina',
-        'username' => 'medina',
-        'email' => 'medina@cfp.com',
-        'password' => Hash::make('P@ssw0rd'),
+        'username' => $this->username,
+        'email' => $this->email,
+        'password' => Hash::make($this->password),
     ]);
 });
 

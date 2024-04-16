@@ -15,6 +15,7 @@ it('can create a user', function () {
         'last_name' => 'Medina',
         'username' => 'medinaalexandre',
         'email' => 'contato@medinaalexandre.dev',
+        'mobile' => '+5555999999999',
         'password' => 'Str0ngP@ssw0rd!',
     ];
 

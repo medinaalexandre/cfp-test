@@ -1,9 +1,5 @@
 const Home = () => {
-    return (
-        <div>
-            LOGGED IN
-        </div>
-    );
+    return 'Welcome home :)';
 };
 
 export default Home;
