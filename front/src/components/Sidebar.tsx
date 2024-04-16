@@ -7,16 +7,17 @@ import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import PersonIcon from '@mui/icons-material/Person';
+import { Link } from '@mui/joy';
+import { Link as ReactRouterLink } from 'react-router-dom';
 
 export default function Sidebar() {
     return (
         <Sheet
-            className="Sidebar"
             sx={{
                 position: { xs: 'fixed', md: 'sticky' },
                 zIndex: 1000,
                 height: '100vh',
-                width: 230,
+                width: 200,
                 top: 0,
                 p: 2.5,
                 flexShrink: 0,
@@ -32,22 +33,34 @@ export default function Sidebar() {
             </Box>
             <Box>
                 <List size="sm">
-                    <ListItem>
-                        <ListItemButton>
-                            <HomeRoundedIcon />
-                            <ListItemContent>
-                                <Typography level="title-sm">Home</Typography>
-                            </ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemButton>
-                            <PersonIcon />
-                            <ListItemContent>
-                                <Typography level="title-sm">Users</Typography>
-                            </ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
+                    <Link component={ReactRouterLink} to="/" underline="none">
+                        <ListItem>
+                            <ListItemButton>
+                                <HomeRoundedIcon />
+                                <ListItemContent>
+                                    <Typography level="title-sm">
+                                        Home
+                                    </Typography>
+                                </ListItemContent>
+                            </ListItemButton>
+                        </ListItem>
+                    </Link>
+                    <Link
+                        component={ReactRouterLink}
+                        to="/users"
+                        underline="none"
+                    >
+                        <ListItem>
+                            <ListItemButton>
+                                <PersonIcon />
+                                <ListItemContent>
+                                    <Typography level="title-sm">
+                                        Users
+                                    </Typography>
+                                </ListItemContent>
+                            </ListItemButton>
+                        </ListItem>
+                    </Link>
                 </List>
             </Box>
         </Sheet>

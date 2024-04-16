@@ -1,12 +1,15 @@
 import Box from '@mui/joy/Box';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useQuery } from 'react-query';
-import { CircularProgress, Sheet, Stack, Table } from '@mui/joy';
+import { Button, CircularProgress, Sheet, Stack, Table } from '@mui/joy';
 import { User, UserData } from '../../entities/User.ts';
 import Typography from '@mui/joy/Typography';
+import { Link as ReactRouterLink } from 'react-router-dom';
+
 const Users = () => {
     const fetchData = async () => await User.list();
     const { isLoading, data } = useQuery(['orders', ''], fetchData);
@@ -65,6 +68,13 @@ const Users = () => {
                 <Typography level="h2" component="h1">
                     Users
                 </Typography>
+                <Button
+                    startDecorator={<AddIcon />}
+                    component={ReactRouterLink}
+                    to="/users/create"
+                >
+                    Add new user
+                </Button>
             </Box>
             <div>
                 <Sheet
@@ -113,7 +123,12 @@ const Users = () => {
                                             {user.mobile}
                                         </Typography>
                                     </td>
-                                    <td>
+                                    <td
+                                        style={{
+                                            textOverflow: 'ellipsis',
+                                            overflow: 'hidden',
+                                        }}
+                                    >
                                         <Typography level="body-sm">
                                             {user.email}
                                         </Typography>
