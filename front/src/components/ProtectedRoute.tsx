@@ -1,7 +1,7 @@
 import { useAuth } from '../providers/AuthContextProvider.tsx';
 import { Navigate, useLocation } from 'react-router-dom';
 import React from 'react';
-import { Stack } from '@mui/joy';
+import { Box } from '@mui/joy';
 import Sidebar from './Sidebar.tsx';
 
 interface ProtectedRouteInterface {
@@ -17,10 +17,10 @@ export const ProtectedRoute = ({ children }: ProtectedRouteInterface) => {
     }
 
     return (
-        <Stack sx={{ minHeight: '100dvh' }}>
+        <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
             <Sidebar />
             {children}
-        </Stack>
+        </Box>
     );
 };
 

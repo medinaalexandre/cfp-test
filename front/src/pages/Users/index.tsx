@@ -73,7 +73,7 @@ const Users = () => {
                     component={ReactRouterLink}
                     to="/users/create"
                 >
-                    Add new user
+                    Create user
                 </Button>
             </Box>
             <div>

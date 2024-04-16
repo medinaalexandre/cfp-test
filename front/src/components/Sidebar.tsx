@@ -18,7 +18,6 @@ export default function Sidebar() {
                 zIndex: 1000,
                 height: '100vh',
                 width: 200,
-                top: 0,
                 p: 2.5,
                 flexShrink: 0,
                 display: 'flex',
