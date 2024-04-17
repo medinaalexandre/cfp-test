@@ -37,3 +37,9 @@ it('receive unauthorized when gives wrong credentials', function () {
         'password' => $this->password.'WRONG',
     ])->assertUnauthorized();
 });
+
+it('can logout', function () {
+    $this->actingAs(User::factory()->create());
+    $this->post('/api/logout')
+        ->assertNoContent();
+});

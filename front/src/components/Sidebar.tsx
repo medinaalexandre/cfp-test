@@ -6,11 +6,14 @@ import ListItemContent from '@mui/joy/ListItemContent';
 import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
-import { Link } from '@mui/joy';
-import { Link as ReactRouterLink } from 'react-router-dom';
+import { Button, Divider, Link } from '@mui/joy';
+import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
+import { Auth } from '../entities/Auth.ts';
 
 export default function Sidebar() {
+    const navigate = useNavigate();
     return (
         <Sheet
             sx={{
@@ -62,6 +65,15 @@ export default function Sidebar() {
                     </Link>
                 </List>
             </Box>
+            <Divider sx={{ mt: 'auto' }} />
+            <Button
+                endDecorator={<LogoutIcon />}
+                variant="plain"
+                color="neutral"
+                onClick={() => Auth.logout().then(() => navigate('/'))}
+            >
+                Logout
+            </Button>
         </Sheet>
     );
 }

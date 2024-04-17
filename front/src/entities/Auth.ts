@@ -8,13 +8,14 @@ export interface LoginInterface {
 
 class AuthEntity {
     login = (params: LoginInterface) =>
-        Api.post('/api/login', { ...params })
-            .catch((e) => console.error(e))
+        Api.post('/api/login', { ...params }).catch((e) => console.error(e));
+
+    logout = () => Api.post('/api/logout');
 
     check = async () => {
         await Api.get('/sanctum/csrf-cookie');
         return Api.get('/api/check');
-    }
+    };
 }
 
 export const Auth: AuthEntity = new AuthEntity();
