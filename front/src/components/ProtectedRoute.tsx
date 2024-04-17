@@ -17,7 +17,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteInterface) => {
     }
 
     return (
-        <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
+        <Box sx={{ display: 'flex', height: '100vh' }}>
             <Sidebar />
             {children}
         </Box>

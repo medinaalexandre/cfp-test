@@ -83,7 +83,13 @@ const Users = () => {
                         borderRadius: 'sm',
                     }}
                 >
-                    <Table stickyHeader stickyFooter stripe="odd" hoverRow>
+                    <Table
+                        stickyHeader
+                        stickyFooter
+                        stripe="odd"
+                        hoverRow
+                        sx={{ overflowY: 'scroll' }}
+                    >
                         <thead>
                             <tr>
                                 <th style={{ width: 40 }}>ID</th>

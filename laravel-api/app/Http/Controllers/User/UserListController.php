@@ -14,7 +14,7 @@ class UserListController extends Controller
     {
         // TODO implement filters and paginate params
 
-        $users = User::query()->paginate(100);
+        $users = User::query()->paginate(20);
 
         return UserResource::collection($users);
     }
