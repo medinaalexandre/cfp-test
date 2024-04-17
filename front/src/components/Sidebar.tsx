@@ -14,7 +14,7 @@ export default function Sidebar() {
     return (
         <Sheet
             sx={{
-                position: { xs: 'fixed', md: 'sticky' },
+                position: { xs: 'fixed' },
                 zIndex: 1000,
                 height: '100vh',
                 width: 200,

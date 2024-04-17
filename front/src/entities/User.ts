@@ -20,6 +20,14 @@ export interface CreateOrUpdateUser extends CommonUser {
 
 interface UserListResponse {
     data: Array<UserData>;
+    meta: {
+        current_page: number;
+        from: number;
+        last_page: number;
+        per_page: number;
+        to: number;
+        total: number;
+    };
 }
 
 interface UserCreateOrUpdateResponse {

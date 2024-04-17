@@ -65,7 +65,6 @@ const CreateUser = () => {
     });
 
     useEffect(() => {
-        console.log('calc pass');
         const currentPassword = formik.values.password;
         let level = formik.values.password.length;
 

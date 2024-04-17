@@ -1,18 +1,54 @@
 import Box from '@mui/joy/Box';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
 import { useQuery } from 'react-query';
-import { Button, CircularProgress, Sheet, Stack, Table } from '@mui/joy';
+import {
+    Button,
+    CircularProgress,
+    FormControl,
+    FormLabel,
+    IconButton,
+    Input,
+    Option,
+    Select,
+    Sheet,
+    Stack,
+    Table,
+} from '@mui/joy';
 import { User, UserData } from '../../entities/User.ts';
 import Typography from '@mui/joy/Typography';
 import { Link as ReactRouterLink } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { perPageOptions } from '../../constants/pagination.ts';
+
+interface UserListParams {
+    per_page?: number;
+    current_page: number;
+}
 
 const Users = () => {
+    const [params, setParams] = useState<UserListParams>({} as UserListParams);
+
     const fetchData = async () => await User.list();
     const { isLoading, data } = useQuery(['orders', ''], fetchData);
+
+    useEffect(() => {
+        if (!data) {
+            return;
+        }
+        setParams({
+            per_page: data.meta.per_page,
+            current_page: data.meta.current_page,
+        });
+    }, [data]);
 
     if (isLoading) {
         return (
@@ -76,6 +112,16 @@ const Users = () => {
                     Create user
                 </Button>
             </Box>
+            <Stack>
+                <FormControl sx={{ flex: 1 }} size="sm">
+                    <FormLabel>Search by email</FormLabel>
+                    <Input
+                        size="sm"
+                        placeholder="Search"
+                        startDecorator={<SearchIcon />}
+                    />
+                </FormControl>
+            </Stack>
             <div>
                 <Sheet
                     variant="outlined"
@@ -153,6 +199,78 @@ const Users = () => {
                         </tbody>
                     </Table>
                 </Sheet>
+                <Stack
+                    sx={{ py: 2 }}
+                    direction="row"
+                    justifyContent="space-between"
+                >
+                    <Stack direction="row" alignItems="center">
+                        <Typography level="body-sm">Items per page</Typography>
+                        <Select
+                            defaultValue={15}
+                            sx={{ mx: 1 }}
+                            size="sm"
+                            onChange={(_, newValue) => {
+                                if (newValue) {
+                                    setParams((prev) => ({
+                                        ...prev,
+                                        per_page: +newValue,
+                                    }));
+                                }
+                            }}
+                        >
+                            {perPageOptions.map((i) => (
+                                <Option value={i}>{i}</Option>
+                            ))}
+                        </Select>
+                        <Typography level="body-sm">
+                            {data?.meta.from}-{data?.meta.to} of{' '}
+                            {data?.meta.total} items
+                        </Typography>
+                    </Stack>
+                    <Stack direction="row" alignItems="center">
+                        <IconButton color="primary">
+                            <FirstPageIcon />
+                        </IconButton>
+                        <Button
+                            startDecorator={<NavigateBeforeIcon />}
+                            size="sm"
+                            variant="plain"
+                        >
+                            Previous
+                        </Button>
+                        <Input
+                            size="sm"
+                            type="tel"
+                            slotProps={{
+                                input: {
+                                    min: 1,
+                                    max: data?.meta.last_page,
+                                    step: 1,
+                                },
+                            }}
+                            value={params.current_page}
+                            sx={{ width: 30, mr: 1 }}
+                            onChange={(e) =>
+                                setParams((prev) => ({
+                                    ...prev,
+                                    current_page: +e.target.value,
+                                }))
+                            }
+                        />
+                        of {data?.meta.last_page}
+                        <Button
+                            endDecorator={<NavigateNextIcon />}
+                            size="sm"
+                            variant="plain"
+                        >
+                            Next
+                        </Button>
+                        <IconButton color="primary">
+                            <LastPageIcon />
+                        </IconButton>
+                    </Stack>
+                </Stack>
             </div>
         </Box>
     );

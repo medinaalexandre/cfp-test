@@ -19,7 +19,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteInterface) => {
     return (
         <Box sx={{ display: 'flex', height: '100vh' }}>
             <Sidebar />
-            {children}
+            <div style={{ marginLeft: 200 }}>{children}</div>
         </Box>
     );
 };

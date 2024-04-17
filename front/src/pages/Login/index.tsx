@@ -1,8 +1,8 @@
 import { Button, FormControl, FormLabel, Input, Stack } from '@mui/joy';
 import { Auth } from '../../entities/Auth.ts';
 import { useState } from 'react';
-import {Form, Navigate, useNavigate} from 'react-router-dom';
-import {useAuth} from "../../providers/AuthContextProvider.tsx";
+import { Form, Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../providers/AuthContextProvider.tsx';
 
 const Login = () => {
     const [email, setEmail] = useState<string>('');
@@ -11,7 +11,7 @@ const Login = () => {
     const { isAuthenticated, setIsAuthenticated } = useAuth();
 
     if (isAuthenticated) {
-        return <Navigate to='/'/>
+        return <Navigate to="/" />;
     }
 
     const login = () => {
@@ -23,10 +23,12 @@ const Login = () => {
             email,
             password,
             device_name: navigator.userAgent,
-        }).then(() => {
-            setIsAuthenticated(true);
-            navigate('/')
-        }).catch((e) => console.error(e));
+        })
+            .then(() => {
+                setIsAuthenticated(true);
+                navigate('/');
+            })
+            .catch((e) => console.error(e));
     };
 
     return (
