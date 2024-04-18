@@ -379,6 +379,13 @@ const Users = () => {
                                             >
                                                 <EditIcon />
                                                 <IconButton
+                                                    sx={{
+                                                        ':hover': {
+                                                            backgroundColor:
+                                                                'var(--joy-palette-danger-800)',
+                                                            color: 'var(--joy-palette-danger-300)',
+                                                        },
+                                                    }}
                                                     onClick={() =>
                                                         handleDeleteUser(user)
                                                     }
