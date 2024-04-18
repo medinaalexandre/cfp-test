@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Services\UserService;
+use Illuminate\Auth\Access\AuthorizationException;
 
 beforeEach(function () {
     $this->service = new UserService();
@@ -45,9 +46,21 @@ it('can update a user', function () {
 
 it('can delete a user', function () {
     $user = User::factory()->create();
-
+    $this->actingAs(User::factory()->create());
     $this->service->delete($user);
 
     expect(User::find($user->getKey()))
         ->toBeNull();
 });
+
+it('cannot delete a admin user', function () {
+    $user = User::factory()->create(['is_admin' => true]);
+    $this->actingAs(User::factory()->create());
+    $this->service->delete($user);
+})->throws(AuthorizationException::class);
+
+it('cannot delete itself', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $this->service->delete($user);
+})->throws(AuthorizationException::class);

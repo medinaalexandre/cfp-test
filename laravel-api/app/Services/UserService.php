@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\User;
 use Hash;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Gate;
 
 class UserService
 {
@@ -33,8 +35,13 @@ class UserService
         return tap($user)->save();
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function delete(User $user): void
     {
+        Gate::authorize('delete', $user);
+
         $user->delete();
     }
 }
