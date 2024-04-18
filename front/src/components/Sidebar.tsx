@@ -8,7 +8,10 @@ import Sheet from '@mui/joy/Sheet';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
-import { Button, Divider, Link } from '@mui/joy';
+import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
+import LightModeIcon from '@mui/icons-material/LightMode';
+
+import { Button, Divider, Link, useColorScheme } from '@mui/joy';
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
 import { Auth } from '../entities/Auth.ts';
 import { useAuth } from '../providers/AuthContextProvider.tsx';
@@ -16,6 +19,7 @@ import { useAuth } from '../providers/AuthContextProvider.tsx';
 export default function Sidebar() {
     const navigate = useNavigate();
     const auth = useAuth();
+    const { mode, setMode } = useColorScheme();
 
     return (
         <Sheet
@@ -68,7 +72,22 @@ export default function Sidebar() {
                     </Link>
                 </List>
             </Box>
-            <Divider sx={{ mt: 'auto' }} />
+            <Button
+                sx={{
+                    mt: 'auto',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                }}
+                variant="outlined"
+                onClick={() => {
+                    setMode(mode === 'light' ? 'dark' : 'light');
+                }}
+            >
+                <Typography level="body-sm">Change mode </Typography>
+                {mode === 'light' ? <LightModeIcon /> : <DarkModeRoundedIcon />}
+            </Button>
+            <Divider />
             <Button
                 endDecorator={<LogoutIcon />}
                 variant="plain"
@@ -79,8 +98,12 @@ export default function Sidebar() {
                         navigate('/login');
                     })
                 }
+                sx={{
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                }}
             >
-                Logout
+                <Typography level="body-sm">Logout</Typography>
             </Button>
         </Sheet>
     );
