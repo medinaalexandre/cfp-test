@@ -47,8 +47,13 @@ export interface UserListParams {
 
 class UserEntity {
     list = async (params: UserListParams) => {
-        console.log(params);
-        return await Api.get('/api/users', { params }).then(
+        const cleanParams = Object.fromEntries(
+            Object.entries(params).filter(
+                ([, v]) => v !== null && v !== undefined && v !== ''
+            )
+        );
+
+        return await Api.get('/api/users', { params: cleanParams }).then(
             (res: AxiosResponse<UserListResponse>) => res.data
         );
     };

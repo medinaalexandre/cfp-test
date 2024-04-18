@@ -12,7 +12,7 @@ class ListUserRequest extends FormRequest
         $numericRule = 'nullable|numeric|min:0';
 
         return [
-            'per_page' => $numericRule . '|max:100',
+            'per_page' => $numericRule.'|max:100',
             'current_page' => $stringRule,
             'search' => $stringRule,
             'id' => $numericRule,

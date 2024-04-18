@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "343b8bf361e5494d6bbb999d36f32805",
+    "content-hash": "d6c1035faa1ed1fc8593f02a1f9313dd",
     "packages": [
         {
             "name": "barryvdh/laravel-ide-helper",
@@ -6709,73 +6709,6 @@
                 "source": "https://github.com/laravel/sail"
             },
             "time": "2024-03-20T20:09:31+00:00"
-        },
-        {
-            "name": "milroyfraser/pest-plugin-gwt",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/milroyfraser/pest-plugin-gwt.git",
-                "reference": "f1f72d01a0688059f7d6723070cfad0343842d0c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/milroyfraser/pest-plugin-gwt/zipball/f1f72d01a0688059f7d6723070cfad0343842d0c",
-                "reference": "f1f72d01a0688059f7d6723070cfad0343842d0c",
-                "shasum": ""
-            },
-            "require": {
-                "pestphp/pest": "^2.0.0",
-                "pestphp/pest-plugin": "^2.0.0",
-                "php": "^8.1"
-            },
-            "require-dev": {
-                "pestphp/pest-dev-tools": "^2.0.0"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/Autoload.php"
-                ],
-                "psr-4": {
-                    "Pest\\Gwt\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Given When Then(GWT) Plugin for Pest",
-            "keywords": [
-                "aaa",
-                "framework",
-                "gwt",
-                "pest",
-                "php",
-                "plugin",
-                "test",
-                "testing",
-                "unit"
-            ],
-            "support": {
-                "issues": "https://github.com/milroyfraser/pest-plugin-gwt/issues",
-                "source": "https://github.com/milroyfraser/pest-plugin-gwt/tree/1.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=66BYDWAT92N6L",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/nunomaduro",
-                    "type": "github"
-                },
-                {
-                    "url": "https://www.patreon.com/nunomaduro",
-                    "type": "patreon"
-                }
-            ],
-            "time": "2023-02-12T16:15:27+00:00"
         },
         {
             "name": "mockery/mockery",
