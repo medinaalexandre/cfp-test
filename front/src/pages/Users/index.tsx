@@ -1,3 +1,4 @@
+import { ChangeEvent, useEffect } from 'react';
 import Box from '@mui/joy/Box';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
@@ -9,12 +10,20 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
-import { useQuery } from 'react-query';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
+import BadgeIcon from '@mui/icons-material/Badge';
+import PersonIcon from '@mui/icons-material/Person';
+import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
+import EmailIcon from '@mui/icons-material/Email';
+
+import { useQuery, useQueryClient } from 'react-query';
 import {
     Button,
     CircularProgress,
     FormControl,
     FormLabel,
+    Grid,
     IconButton,
     Input,
     Option,
@@ -23,34 +32,48 @@ import {
     Stack,
     Table,
 } from '@mui/joy';
-import { User, UserData } from '../../entities/User.ts';
+import { User, UserData, UserListParams } from '../../entities/User.ts';
 import Typography from '@mui/joy/Typography';
 import { Link as ReactRouterLink } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { perPageOptions } from '../../constants/pagination.ts';
 
-interface UserListParams {
-    per_page?: number;
-    current_page: number;
-}
+const initialParamsValue: UserListParams = {
+    current_page: 1,
+    email: undefined,
+    first_name: undefined,
+    username: undefined,
+    id: undefined,
+    last_name: undefined,
+    mobile: undefined,
+    per_page: 15,
+};
 
 const Users = () => {
-    const [params, setParams] = useState<UserListParams>({} as UserListParams);
+    const queryClient = useQueryClient();
 
-    const fetchData = async () => await User.list();
-    const { isLoading, data } = useQuery(['orders', ''], fetchData);
+    const [params, setParams] = useState<UserListParams>(initialParamsValue);
+    const [showFilters, setShowFilters] = useState<boolean>(false);
+
+    const fetchData = async () => await User.list(params);
+    const { isLoading, data } = useQuery(['orders', params], fetchData);
+
+    const updateFilter = (event: ChangeEvent<HTMLInputElement>) => {
+        setParams({ ...params, [event.target.name]: event.target.value });
+    };
+
+    const updatePagination = (
+        field: 'current_page' | 'per_page',
+        value: number
+    ) => {
+        setParams({ ...params, [field]: value });
+    };
 
     useEffect(() => {
-        if (!data) {
-            return;
-        }
-        setParams({
-            per_page: data.meta.per_page,
-            current_page: data.meta.current_page,
-        });
-    }, [data]);
+        queryClient.invalidateQueries('orders', {});
+    }, [params]);
 
-    if (isLoading) {
+    if (isLoading || !data) {
         return (
             <Stack
                 alignItems="center"
@@ -112,16 +135,123 @@ const Users = () => {
                     Create user
                 </Button>
             </Box>
-            <Stack>
+            <Stack direction="row" alignItems="end">
                 <FormControl sx={{ flex: 1 }} size="sm">
-                    <FormLabel>Search by email</FormLabel>
+                    <FormLabel>Search</FormLabel>
                     <Input
                         size="sm"
-                        placeholder="Search"
+                        placeholder="Search by username, email or mobile"
                         startDecorator={<SearchIcon />}
                     />
                 </FormControl>
+                <IconButton
+                    sx={{ ml: 2 }}
+                    onClick={() => setShowFilters((prev) => !prev)}
+                >
+                    <FilterAltIcon />{' '}
+                    <Typography level="body-md">Filters</Typography>
+                </IconButton>
             </Stack>
+            <Grid
+                container
+                spacing={2}
+                sx={{
+                    visibility: showFilters ? 'visible' : 'hidden',
+                    height: showFilters ? 'auto' : 0,
+                    mb: 1,
+                }}
+            >
+                <Grid xs={2}>
+                    <FormControl sx={{ flex: 1 }} size="sm">
+                        <FormLabel>ID</FormLabel>
+                        <Input
+                            size="sm"
+                            value={params.id}
+                            name="id"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                updateFilter(e)
+                            }
+                            placeholder="Search by ID"
+                            endDecorator={<FingerprintIcon />}
+                        />
+                    </FormControl>
+                </Grid>
+                <Grid xs={2}>
+                    <FormControl sx={{ flex: 1 }} size="sm">
+                        <FormLabel>First Name</FormLabel>
+                        <Input
+                            size="sm"
+                            name="first_name"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                updateFilter(e)
+                            }
+                            value={params.first_name}
+                            placeholder="Search by first name"
+                            endDecorator={<BadgeIcon />}
+                        />
+                    </FormControl>
+                </Grid>
+                <Grid xs={2}>
+                    <FormControl sx={{ flex: 1 }} size="sm">
+                        <FormLabel>Last Name</FormLabel>
+                        <Input
+                            size="sm"
+                            name="last_name"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                updateFilter(e)
+                            }
+                            value={params.last_name}
+                            placeholder="Search by last name"
+                            endDecorator={<BadgeIcon />}
+                        />
+                    </FormControl>
+                </Grid>
+                <Grid xs={2}>
+                    <FormControl sx={{ flex: 1 }} size="sm">
+                        <FormLabel>Username</FormLabel>
+                        <Input
+                            size="sm"
+                            name="username"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                updateFilter(e)
+                            }
+                            value={params.username}
+                            placeholder="Search by username"
+                            endDecorator={<PersonIcon />}
+                        />
+                    </FormControl>
+                </Grid>
+                <Grid xs={2}>
+                    <FormControl sx={{ flex: 1 }} size="sm">
+                        <FormLabel>E-mail</FormLabel>
+                        <Input
+                            size="sm"
+                            name="email"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                updateFilter(e)
+                            }
+                            value={params.email}
+                            placeholder="Search by e-mail"
+                            endDecorator={<EmailIcon />}
+                        />
+                    </FormControl>
+                </Grid>
+                <Grid xs={2}>
+                    <FormControl sx={{ flex: 1 }} size="sm">
+                        <FormLabel>Mobile</FormLabel>
+                        <Input
+                            size="sm"
+                            name="mobile"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                updateFilter(e)
+                            }
+                            value={params.mobile}
+                            placeholder="Search by mobile"
+                            endDecorator={<PhoneIphoneIcon />}
+                        />
+                    </FormControl>
+                </Grid>
+            </Grid>
             <div>
                 <Sheet
                     variant="outlined"
@@ -210,7 +340,7 @@ const Users = () => {
                             defaultValue={15}
                             sx={{ mx: 1 }}
                             size="sm"
-                            onChange={(_, newValue) => {
+                            onChange={async (_, newValue) => {
                                 if (newValue) {
                                     setParams((prev) => ({
                                         ...prev,
@@ -224,18 +354,29 @@ const Users = () => {
                             ))}
                         </Select>
                         <Typography level="body-sm">
-                            {data?.meta.from}-{data?.meta.to} of{' '}
-                            {data?.meta.total} items
+                            {data.meta.from}-{data.meta.to} of {data.meta.total}{' '}
+                            items
                         </Typography>
                     </Stack>
                     <Stack direction="row" alignItems="center">
-                        <IconButton color="primary">
+                        <IconButton
+                            color="primary"
+                            disabled={params.current_page <= 1}
+                            onClick={() => updatePagination('current_page', 1)}
+                        >
                             <FirstPageIcon />
                         </IconButton>
                         <Button
                             startDecorator={<NavigateBeforeIcon />}
                             size="sm"
                             variant="plain"
+                            disabled={params.current_page <= 1}
+                            onClick={() =>
+                                updatePagination(
+                                    'current_page',
+                                    params.current_page - 1
+                                )
+                            }
                         >
                             Previous
                         </Button>
@@ -245,28 +386,48 @@ const Users = () => {
                             slotProps={{
                                 input: {
                                     min: 1,
-                                    max: data?.meta.last_page,
+                                    max: data.meta.last_page,
                                     step: 1,
                                 },
                             }}
                             value={params.current_page}
                             sx={{ width: 30, mr: 1 }}
                             onChange={(e) =>
-                                setParams((prev) => ({
-                                    ...prev,
-                                    current_page: +e.target.value,
-                                }))
+                                updatePagination(
+                                    'current_page',
+                                    +e.target.value
+                                )
                             }
                         />
-                        of {data?.meta.last_page}
+                        of {data.meta.last_page}
                         <Button
                             endDecorator={<NavigateNextIcon />}
                             size="sm"
                             variant="plain"
+                            disabled={
+                                params.current_page >= data.meta.last_page
+                            }
+                            onClick={() =>
+                                updatePagination(
+                                    'current_page',
+                                    params.current_page + 1
+                                )
+                            }
                         >
                             Next
                         </Button>
-                        <IconButton color="primary">
+                        <IconButton
+                            color="primary"
+                            disabled={
+                                params.current_page >= data.meta.last_page
+                            }
+                            onClick={() =>
+                                updatePagination(
+                                    'current_page',
+                                    data.meta.last_page
+                                )
+                            }
+                        >
                             <LastPageIcon />
                         </IconButton>
                     </Stack>

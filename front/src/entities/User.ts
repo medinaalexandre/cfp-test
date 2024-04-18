@@ -34,9 +34,21 @@ interface UserCreateOrUpdateResponse {
     data: UserData;
 }
 
+export interface UserListParams {
+    per_page?: number;
+    current_page: number;
+    id?: number;
+    first_name?: string;
+    last_name?: string;
+    username?: string;
+    email?: string;
+    mobile?: string;
+}
+
 class UserEntity {
-    list = async () => {
-        return await Api.get('/api/users').then(
+    list = async (params: UserListParams) => {
+        console.log(params);
+        return await Api.get('/api/users', { params }).then(
             (res: AxiosResponse<UserListResponse>) => res.data
         );
     };

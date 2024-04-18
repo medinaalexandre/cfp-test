@@ -3,18 +3,16 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\ListUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class UserListController extends Controller
 {
-    public function __invoke(Request $request): AnonymousResourceCollection
+    public function __invoke(ListUserRequest $request): AnonymousResourceCollection
     {
-        // TODO implement filters and paginate params
-
-        $users = User::query()->paginate(15);
+        $users = User::query()->paginate(perPage: $request->getPerPage(),page: $request->getPage());
 
         return UserResource::collection($users);
     }

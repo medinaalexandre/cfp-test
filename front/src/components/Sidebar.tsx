@@ -11,9 +11,12 @@ import PersonIcon from '@mui/icons-material/Person';
 import { Button, Divider, Link } from '@mui/joy';
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
 import { Auth } from '../entities/Auth.ts';
+import { useAuth } from '../providers/AuthContextProvider.tsx';
 
 export default function Sidebar() {
     const navigate = useNavigate();
+    const auth = useAuth();
+
     return (
         <Sheet
             sx={{
@@ -70,7 +73,12 @@ export default function Sidebar() {
                 endDecorator={<LogoutIcon />}
                 variant="plain"
                 color="neutral"
-                onClick={() => Auth.logout().then(() => navigate('/'))}
+                onClick={() =>
+                    Auth.logout().then(() => {
+                        auth.setIsAuthenticated(false);
+                        navigate('/login');
+                    })
+                }
             >
                 Logout
             </Button>

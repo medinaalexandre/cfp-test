@@ -44,7 +44,7 @@ const CreateUser = () => {
             birthday: '',
         },
         validateOnChange: false,
-        validateOnBlur: false,
+        validateOnBlur: true,
         validationSchema: UserSchema,
         onSubmit: (values) => {
             User.create(values)
