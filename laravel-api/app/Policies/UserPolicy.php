@@ -10,17 +10,17 @@ class UserPolicy
 {
     public function delete(User $user, User $model): Response
     {
-        if ($model->is_admin) {
+        if ($user->id === $model->id) {
             return Response::denyWithStatus(
-                status: HttpResponse::HTTP_UNAUTHORIZED,
-                message: 'You are not authorized to perform this action.'
+                status: HttpResponse::HTTP_FORBIDDEN,
+                message: 'You cannot delete yourself.'
             );
         }
 
-        if ($user->id === $model->id) {
+        if ($model->is_admin || ! $user->is_admin) {
             return Response::denyWithStatus(
-                status: HttpResponse::HTTP_BAD_REQUEST,
-                message: 'You cannot delete yourself.'
+                status: HttpResponse::HTTP_FORBIDDEN,
+                message: 'You are not authorized to perform this action.'
             );
         }
 

@@ -46,21 +46,27 @@ it('can update a user', function () {
 
 it('can delete a user', function () {
     $user = User::factory()->create();
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->create(['is_admin' => true]));
     $this->service->delete($user);
 
     expect(User::find($user->getKey()))
         ->toBeNull();
 });
 
-it('cannot delete a admin user', function () {
-    $user = User::factory()->create(['is_admin' => true]);
+it('cannot delete a user if is not an admin', function () {
+    $user = User::factory()->create();
     $this->actingAs(User::factory()->create());
     $this->service->delete($user);
-})->throws(AuthorizationException::class);
+})->throws(AuthorizationException::class, 'You are not authorized to perform this action.');
+
+it('cannot delete a admin user', function () {
+    $user = User::factory()->create(['is_admin' => true]);
+    $this->actingAs(User::factory()->create(['is_admin' => true]));
+    $this->service->delete($user);
+})->throws(AuthorizationException::class, 'You are not authorized to perform this action.');
 
 it('cannot delete itself', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
     $this->service->delete($user);
-})->throws(AuthorizationException::class);
+})->throws(AuthorizationException::class, 'You cannot delete yourself.');

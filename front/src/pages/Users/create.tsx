@@ -12,6 +12,7 @@ import {
     FormHelperText,
     Grid,
     LinearProgress,
+    Switch,
 } from '@mui/joy';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
@@ -42,6 +43,7 @@ const CreateUser = () => {
             email: '',
             mobile: '',
             birthday: '',
+            is_admin: false,
         },
         validateOnChange: false,
         validateOnBlur: true,
@@ -333,6 +335,25 @@ const CreateUser = () => {
                                         {formik.errors.birthday}
                                     </FormHelperText>
                                 )}
+                            </FormControl>
+                        </Grid>
+                        <Grid xs={6}>
+                            <FormControl
+                                sx={{
+                                    flexWrap: 'wrap',
+                                    alignContent: 'flex-start',
+                                }}
+                            >
+                                <FormLabel>Admin</FormLabel>
+                                <Switch
+                                    onChange={(e) =>
+                                        formik.setFieldValue(
+                                            'is_admin',
+                                            e.target.checked
+                                        )
+                                    }
+                                    checked={formik.values.is_admin}
+                                />
                             </FormControl>
                         </Grid>
                     </Grid>

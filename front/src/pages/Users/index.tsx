@@ -17,7 +17,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import EmailIcon from '@mui/icons-material/Email';
 
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient, useMutation } from 'react-query';
 import {
     Button,
     CircularProgress,
@@ -32,11 +32,19 @@ import {
     Stack,
     Table,
 } from '@mui/joy';
-import { User, UserData, UserListParams } from '../../entities/User.ts';
+import {
+    User,
+    UserData,
+    UserDeleteInterface,
+    UserListParams,
+    UserListResponse,
+} from '../../entities/User.ts';
 import Typography from '@mui/joy/Typography';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { useState } from 'react';
 import { perPageOptions } from '../../constants/pagination.ts';
+import UserListTableSkeleton from '../../components/UserListTableSkeleton.tsx';
+import { useSnackbar } from '../../providers/SnackbarContextProvider.tsx';
 
 const initialParamsValue: UserListParams = {
     current_page: 1,
@@ -51,6 +59,7 @@ const initialParamsValue: UserListParams = {
 
 const Users = () => {
     const queryClient = useQueryClient();
+    const snackBar = useSnackbar();
 
     const [params, setParams] = useState<UserListParams>(initialParamsValue);
     const [showFilters, setShowFilters] = useState<boolean>(false);
@@ -64,9 +73,47 @@ const Users = () => {
 
     const updatePagination = (
         field: 'current_page' | 'per_page',
-        value: number
+        value: number | undefined
     ) => {
         setParams({ ...params, [field]: value });
+    };
+
+    const { mutateAsync: deleteUserFn } = useMutation({
+        mutationFn: async (variables: UserDeleteInterface) => {
+            await User.delete(variables);
+            return null;
+        },
+        onSuccess: async (_, variables) => {
+            const prevData: UserListResponse | undefined =
+                queryClient.getQueryData(['orders', params]);
+
+            if (!prevData) {
+                return;
+            }
+
+            const updatedData: UserListResponse = {
+                ...prevData,
+                data: prevData.data.filter((u) => u.id !== variables.id),
+                meta: {
+                    ...prevData.meta,
+                    total: prevData.meta.total - 1,
+                },
+            };
+
+            queryClient.setQueryData(['orders', params], updatedData);
+        },
+    });
+
+    const handleDeleteUser = (user: UserData) => {
+        deleteUserFn({
+            id: user.id,
+        })
+            .then(() => {
+                snackBar.addSuccess(`User ${user.username} deleted`);
+            })
+            .catch((e) => {
+                snackBar.addError(e.response.data);
+            });
     };
 
     useEffect(() => {
@@ -278,54 +325,71 @@ const Users = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {data?.data.map((user: UserData) => (
-                                <tr key={user.id}>
-                                    <td>
-                                        <Typography level="body-sm">
-                                            {user.id}
-                                        </Typography>
-                                    </td>
-                                    <td>
-                                        <Typography level="body-sm">
-                                            {user.username}
-                                        </Typography>
-                                    </td>
-                                    <td>
-                                        <Typography level="body-sm">
-                                            {user.first_name}
-                                        </Typography>
-                                    </td>
-                                    <td>
-                                        <Typography level="body-sm">
-                                            {user.last_name}
-                                        </Typography>
-                                    </td>
-                                    <td>
-                                        <Typography level="body-sm">
-                                            {user.mobile}
-                                        </Typography>
-                                    </td>
-                                    <td
-                                        style={{
-                                            textOverflow: 'ellipsis',
-                                            overflow: 'hidden',
-                                        }}
-                                    >
-                                        <Typography level="body-sm">
-                                            {user.email}
-                                        </Typography>
-                                    </td>
-                                    <td
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                        }}
-                                    >
-                                        <EditIcon />
-                                        <DeleteIcon />
-                                    </td>
-                                </tr>
-                            ))}
+                            {isLoading ? (
+                                <UserListTableSkeleton
+                                    lines={params.per_page}
+                                />
+                            ) : (
+                                <>
+                                    {data?.data.map((user: UserData) => (
+                                        <tr
+                                            key={user.id}
+                                            style={{ width: '100%' }}
+                                        >
+                                            <td>
+                                                <Typography level="body-sm">
+                                                    {user.id}
+                                                </Typography>
+                                            </td>
+                                            <td>
+                                                <Typography level="body-sm">
+                                                    {user.username}
+                                                </Typography>
+                                            </td>
+                                            <td>
+                                                <Typography level="body-sm">
+                                                    {user.first_name}
+                                                </Typography>
+                                            </td>
+                                            <td>
+                                                <Typography level="body-sm">
+                                                    {user.last_name}
+                                                </Typography>
+                                            </td>
+                                            <td>
+                                                <Typography level="body-sm">
+                                                    {user.mobile}
+                                                </Typography>
+                                            </td>
+                                            <td
+                                                style={{
+                                                    textOverflow: 'ellipsis',
+                                                    overflow: 'hidden',
+                                                }}
+                                            >
+                                                <Typography level="body-sm">
+                                                    {user.email}
+                                                </Typography>
+                                            </td>
+                                            <td
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                }}
+                                            >
+                                                <EditIcon />
+                                                <IconButton
+                                                    onClick={() =>
+                                                        handleDeleteUser(user)
+                                                    }
+                                                >
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </>
+                            )}
                         </tbody>
                     </Table>
                 </Sheet>
@@ -350,12 +414,14 @@ const Users = () => {
                             }}
                         >
                             {perPageOptions.map((i) => (
-                                <Option value={i}>{i}</Option>
+                                <Option value={i} key={i}>
+                                    {i}
+                                </Option>
                             ))}
                         </Select>
                         <Typography level="body-sm">
-                            {data.meta.from}-{data.meta.to} of {data.meta.total}{' '}
-                            items
+                            {data?.meta.from}-{data?.meta.to} of{' '}
+                            {data?.meta.total} items
                         </Typography>
                     </Stack>
                     <Stack direction="row" alignItems="center">
@@ -386,12 +452,12 @@ const Users = () => {
                             slotProps={{
                                 input: {
                                     min: 1,
-                                    max: data.meta.last_page,
+                                    max: data?.meta.last_page,
                                     step: 1,
                                 },
                             }}
                             value={params.current_page}
-                            sx={{ width: 30, mr: 1 }}
+                            sx={{ width: 40, mr: 1 }}
                             onChange={(e) =>
                                 updatePagination(
                                     'current_page',
@@ -399,12 +465,13 @@ const Users = () => {
                                 )
                             }
                         />
-                        of {data.meta.last_page}
+                        of {data?.meta.last_page}
                         <Button
                             endDecorator={<NavigateNextIcon />}
                             size="sm"
                             variant="plain"
                             disabled={
+                                !data ||
                                 params.current_page >= data.meta.last_page
                             }
                             onClick={() =>
@@ -419,12 +486,13 @@ const Users = () => {
                         <IconButton
                             color="primary"
                             disabled={
+                                !data ||
                                 params.current_page >= data.meta.last_page
                             }
                             onClick={() =>
                                 updatePagination(
                                     'current_page',
-                                    data.meta.last_page
+                                    data?.meta.last_page
                                 )
                             }
                         >

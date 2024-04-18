@@ -8,6 +8,7 @@ export interface CommonUser {
     mobile: string;
     email: string;
     birthday: string;
+    is_admin: boolean;
 }
 
 export interface UserData extends CommonUser {
@@ -18,7 +19,7 @@ export interface CreateOrUpdateUser extends CommonUser {
     password: string;
 }
 
-interface UserListResponse {
+export interface UserListResponse {
     data: Array<UserData>;
     meta: {
         current_page: number;
@@ -45,6 +46,10 @@ export interface UserListParams {
     mobile?: string;
 }
 
+export interface UserDeleteInterface {
+    id: number;
+}
+
 class UserEntity {
     list = async (params: UserListParams) => {
         const cleanParams = Object.fromEntries(
@@ -62,6 +67,10 @@ class UserEntity {
         return await Api.post('/api/users', { ...params }).then(
             (res: AxiosResponse<UserCreateOrUpdateResponse>) => res.data
         );
+    };
+
+    delete = async ({ id }: UserDeleteInterface) => {
+        return await Api.delete(`/api/users/${id}`);
     };
 }
 

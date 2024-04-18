@@ -13,7 +13,7 @@ class UserListController extends Controller
 {
     public function __invoke(ListUserRequest $request, UserFilterService $filterService): AnonymousResourceCollection
     {
-        $users = $filterService(User::query(), $request->validated())
+        $users = $filterService(User::query()->orderBy('id'), $request->validated())
             ->paginate(
                 perPage: $request->getPerPage(),
                 page: $request->getPage()

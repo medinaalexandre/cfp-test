@@ -16,7 +16,7 @@ class UserDeleteController extends Controller
         try {
             $service->delete($user);
         } catch (AuthorizationException $exception) {
-            return response()->json($exception->getMessage(), $exception->getCode());
+            return response()->json($exception->response()->message(), $exception->response()->status());
         }
 
         return response()->json(status: Response::HTTP_NO_CONTENT);

@@ -1,4 +1,4 @@
-import { object, string, date } from 'yup';
+import { object, string, date, boolean } from 'yup';
 
 export const UserSchema = object({
     first_name: string().required().min(3).max(255),
@@ -15,4 +15,5 @@ export const UserSchema = object({
             /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]/,
             'Password must contain at least one number, one uppercase letter, one lowercase letter, and one symbol'
         ),
+    is_admin: boolean().required(),
 });

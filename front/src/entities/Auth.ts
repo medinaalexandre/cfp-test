@@ -7,8 +7,7 @@ export interface LoginInterface {
 }
 
 class AuthEntity {
-    login = (params: LoginInterface) =>
-        Api.post('/api/login', { ...params }).catch((e) => console.error(e));
+    login = (params: LoginInterface) => Api.post('/api/login', { ...params });
 
     logout = () => Api.post('/api/logout');
 

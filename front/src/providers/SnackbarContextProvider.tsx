@@ -18,6 +18,8 @@ interface SnackbarProviderInterface {
 
 interface SnackbarContextInterface {
     add: (data: SnackbarData) => void;
+    addSuccess: (text: string) => void;
+    addError: (text: string) => void;
 }
 
 interface SnackbarData {
@@ -51,8 +53,22 @@ const SnackbarContextProvider = ({ children }: SnackbarProviderInterface) => {
         setOpen(true);
     };
 
+    const addSuccess = (text: string) => {
+        add({
+            text,
+            color: 'success',
+        });
+    };
+
+    const addError = (text: string) => {
+        add({
+            text,
+            color: 'danger',
+        });
+    };
+
     return (
-        <SnackbarContext.Provider value={{ add }}>
+        <SnackbarContext.Provider value={{ add, addSuccess, addError }}>
             <div>
                 <Snackbar
                     open={open}

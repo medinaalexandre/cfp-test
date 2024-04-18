@@ -19,6 +19,7 @@ class CreateUserRequest extends FormRequest
             'birthday' => 'nullable|sometimes|date',
             'mobile' => 'nullable|string',
             'password' => ['required', Password::defaults()],
+            'is_admin' => 'boolean',
         ];
     }
 }
