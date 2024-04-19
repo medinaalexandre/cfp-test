@@ -1,4 +1,4 @@
-import { ChangeEvent, KeyboardEvent } from 'react';
+import { ChangeEvent, useEffect } from 'react';
 import Box from '@mui/joy/Box';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
@@ -16,9 +16,10 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import PersonIcon from '@mui/icons-material/Person';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import EmailIcon from '@mui/icons-material/Email';
-import { useQuery, useQueryClient, useMutation } from 'react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import {
     Button,
+    Chip,
     FormControl,
     FormLabel,
     Grid,
@@ -55,6 +56,22 @@ export const initialParamsValue: UserListParams = {
     per_page: 15,
 };
 
+function useDebounce<T>(value: T, delay: number): T {
+    const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+
+    return debouncedValue;
+}
+
 const Users = () => {
     const queryClient = useQueryClient();
     const snackBar = useSnackbar();
@@ -62,34 +79,21 @@ const Users = () => {
 
     const [params, setParams] = useState<UserListParams>(initialParamsValue);
     const [showFilters, setShowFilters] = useState<boolean>(false);
-    const [usedParamsOnFilter, setUsedParamsOnFilter] =
-        useState<UserListParams>(initialParamsValue);
+    const debouncedParamsValue = useDebounce<UserListParams>(params, 200);
 
-    const fetchData = async () => await User.list(params);
-    const { isLoading, data } = useQuery(
-        ['orders', usedParamsOnFilter],
-        fetchData,
-        {
-            staleTime: Infinity,
-        }
-    );
-
-    const invalidateOrdersQuery = async () => {
-        await queryClient.invalidateQueries('orders', {
-            stale: true,
-            exact: false,
-        });
-        setUsedParamsOnFilter(params);
-    };
-
-    const applyFiltersOnKeyUp = async (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            await invalidateOrdersQuery();
-        }
-    };
+    const fetchData = async () => await User.list(debouncedParamsValue);
+    const { isLoading, data } = useQuery({
+        queryKey: ['orders', debouncedParamsValue],
+        queryFn: fetchData,
+        staleTime: 20 * 1000,
+    });
 
     const updateFilter = (event: ChangeEvent<HTMLInputElement>) => {
-        setParams({ ...params, [event.target.name]: event.target.value });
+        setParams({
+            ...params,
+            [event.target.name]: event.target.value,
+            current_page: 1,
+        });
     };
 
     const updatePagination = async (
@@ -97,7 +101,6 @@ const Users = () => {
         value: number | undefined
     ) => {
         setParams({ ...params, [field]: value });
-        await invalidateOrdersQuery();
     };
 
     const { mutateAsync: deleteUserFn } = useMutation({
@@ -107,7 +110,7 @@ const Users = () => {
         },
         onSuccess: async (_, variables) => {
             const prevData: UserListResponse | undefined =
-                queryClient.getQueryData(['orders', usedParamsOnFilter]);
+                queryClient.getQueryData(['orders', debouncedParamsValue]);
 
             if (!prevData) {
                 return;
@@ -122,10 +125,7 @@ const Users = () => {
                 },
             };
 
-            queryClient.setQueryData(
-                ['orders', usedParamsOnFilter],
-                updatedData
-            );
+            queryClient.setQueryData(['orders', params], updatedData);
         },
     });
 
@@ -195,8 +195,9 @@ const Users = () => {
                         size="sm"
                         placeholder="Search by username, email or mobile"
                         startDecorator={<SearchIcon />}
-                        onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
-                            applyFiltersOnKeyUp(e)
+                        name="search"
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            updateFilter(e)
                         }
                     />
                 </FormControl>
@@ -221,9 +222,6 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>ID</FormLabel>
                         <Input
-                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
-                                applyFiltersOnKeyUp(e)
-                            }
                             size="sm"
                             value={params.id ?? ''}
                             name="id"
@@ -239,9 +237,6 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>First Name</FormLabel>
                         <Input
-                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
-                                applyFiltersOnKeyUp(e)
-                            }
                             size="sm"
                             name="first_name"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -257,9 +252,6 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>Last Name</FormLabel>
                         <Input
-                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
-                                applyFiltersOnKeyUp(e)
-                            }
                             size="sm"
                             name="last_name"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -275,9 +267,6 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>Username</FormLabel>
                         <Input
-                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
-                                applyFiltersOnKeyUp(e)
-                            }
                             size="sm"
                             name="username"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -293,9 +282,6 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>E-mail</FormLabel>
                         <Input
-                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
-                                applyFiltersOnKeyUp(e)
-                            }
                             size="sm"
                             name="email"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -311,9 +297,6 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>Mobile</FormLabel>
                         <Input
-                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
-                                applyFiltersOnKeyUp(e)
-                            }
                             size="sm"
                             name="mobile"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -338,7 +321,7 @@ const Users = () => {
                         stickyFooter
                         stripe="odd"
                         hoverRow
-                        sx={{ overflowY: 'scroll' }}
+                        sx={{ overflowX: 'scroll' }}
                     >
                         <thead>
                             <tr>
@@ -359,18 +342,27 @@ const Users = () => {
                             ) : (
                                 <>
                                     {data?.data.map((user: UserData) => (
-                                        <tr
-                                            key={user.id}
-                                            style={{ width: '100%' }}
-                                        >
+                                        <tr key={user.id}>
                                             <td>
                                                 <Typography level="body-sm">
                                                     {user.id}
                                                 </Typography>
                                             </td>
                                             <td>
-                                                <Typography level="body-sm">
-                                                    {user.username}
+                                                <Typography
+                                                    level="body-sm"
+                                                    endDecorator={
+                                                        user.is_admin && (
+                                                            <Chip
+                                                                size="sm"
+                                                                color="primary"
+                                                            >
+                                                                admin
+                                                            </Chip>
+                                                        )
+                                                    }
+                                                >
+                                                    {user.username}{' '}
                                                 </Typography>
                                             </td>
                                             <td>
@@ -398,12 +390,7 @@ const Users = () => {
                                                     {user.email}
                                                 </Typography>
                                             </td>
-                                            <td
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                }}
-                                            >
+                                            <td>
                                                 <IconButton
                                                     onClick={() =>
                                                         navigate(
@@ -452,7 +439,6 @@ const Users = () => {
                                         ...prev,
                                         per_page: +newValue,
                                     }));
-                                    await invalidateOrdersQuery();
                                 }
                             }}
                         >

@@ -4,6 +4,7 @@ import Home from '../pages/Home';
 import ProtectedRoute from '../components/ProtectedRoute.tsx';
 import Users from '../pages/Users';
 import UserForm from '../pages/Users/form.tsx';
+import UserView from '../pages/Users/view.tsx';
 
 export const Routes = createBrowserRouter([
     {
@@ -31,6 +32,14 @@ export const Routes = createBrowserRouter([
         element: (
             <ProtectedRoute>
                 <UserForm />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: '/users/:userId',
+        element: (
+            <ProtectedRoute>
+                <UserView />
             </ProtectedRoute>
         ),
     },

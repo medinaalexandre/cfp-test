@@ -19,6 +19,14 @@ class UserFilterService
     public function __invoke(Builder $query, array $filters): Builder
     {
         foreach ($filters as $key => $value) {
+            if ($key === 'search') {
+                $query->where(function ($query) use ($value) {
+                    $query->where('username', 'like', "$value%")
+                        ->orWhere('email', 'like', "$value%")
+                        ->orWhere('mobile', 'like', "$value%");
+                });
+            }
+
             if (in_array($key, self::WHERE_LIKE_FILTERS)) {
                 $query->where($key, 'like', $value.'%');
 
