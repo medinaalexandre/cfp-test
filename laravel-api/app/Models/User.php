@@ -20,7 +20,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string $first_name
  * @property string $last_name
  * @property string $email
- * @property string|null $birthday
+ * @property Carbon|null $birthday
  * @property Carbon|null $email_verified_at
  * @property string|null $mobile
  * @property string $username
@@ -85,6 +85,7 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
+        'birthday' => 'datetime',
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];

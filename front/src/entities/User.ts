@@ -1,54 +1,13 @@
 import Api from '../services/api.ts';
 import { AxiosResponse } from 'axios';
-
-export interface CommonUser {
-    first_name: string;
-    last_name: string;
-    username: string;
-    mobile: string;
-    email: string;
-    birthday: string;
-    is_admin: boolean;
-}
-
-export interface UserData extends CommonUser {
-    id: number;
-}
-
-export interface CreateOrUpdateUser extends CommonUser {
-    password: string;
-}
-
-export interface UserListResponse {
-    data: Array<UserData>;
-    meta: {
-        current_page: number;
-        from: number;
-        last_page: number;
-        per_page: number;
-        to: number;
-        total: number;
-    };
-}
-
-interface UserCreateOrUpdateResponse {
-    data: UserData;
-}
-
-export interface UserListParams {
-    per_page?: number;
-    current_page: number;
-    id?: number;
-    first_name?: string;
-    last_name?: string;
-    username?: string;
-    email?: string;
-    mobile?: string;
-}
-
-export interface UserDeleteInterface {
-    id: number;
-}
+import {
+    CreateOrUpdateUser,
+    UserCreateOrUpdateResponse,
+    UserDeleteInterface,
+    UserListParams,
+    UserListResponse,
+    UserResponse,
+} from './User.types.ts';
 
 class UserEntity {
     list = async (params: UserListParams) => {
@@ -63,8 +22,28 @@ class UserEntity {
         );
     };
 
+    get = async (id: number) => {
+        return await Api.get(`/api/users/${id}`).then(
+            (res: AxiosResponse<UserResponse>) => res.data
+        );
+    };
+
+    createOrUpdate = async (params: CreateOrUpdateUser) => {
+        if (params.id) {
+            return await this.update(params);
+        }
+
+        return await this.create(params);
+    };
+
     create = async (params: CreateOrUpdateUser) => {
         return await Api.post('/api/users', { ...params }).then(
+            (res: AxiosResponse<UserCreateOrUpdateResponse>) => res.data
+        );
+    };
+
+    update = async (params: CreateOrUpdateUser) => {
+        return await Api.put(`/api/users/${params.id}`, { ...params }).then(
             (res: AxiosResponse<UserCreateOrUpdateResponse>) => res.data
         );
     };

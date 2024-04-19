@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'email' => $user->email,
             'mobile' => $user->mobile,
             'is_admin' => $user->is_admin,
+            'birthday' => $user->birthday?->toDateString() ?? '',
         ];
     }
 }

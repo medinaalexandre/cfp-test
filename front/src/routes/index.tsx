@@ -3,7 +3,7 @@ import Login from '../pages/Login';
 import Home from '../pages/Home';
 import ProtectedRoute from '../components/ProtectedRoute.tsx';
 import Users from '../pages/Users';
-import CreateUser from '../pages/Users/create.tsx';
+import UserForm from '../pages/Users/form.tsx';
 
 export const Routes = createBrowserRouter([
     {
@@ -30,7 +30,15 @@ export const Routes = createBrowserRouter([
         path: '/users/create',
         element: (
             <ProtectedRoute>
-                <CreateUser />
+                <UserForm />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: '/users/:userId/edit',
+        element: (
+            <ProtectedRoute>
+                <UserForm />
             </ProtectedRoute>
         ),
     },

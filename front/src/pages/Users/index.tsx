@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect } from 'react';
+import { ChangeEvent, KeyboardEvent } from 'react';
 import Box from '@mui/joy/Box';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
@@ -16,11 +16,9 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import PersonIcon from '@mui/icons-material/Person';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import EmailIcon from '@mui/icons-material/Email';
-
 import { useQuery, useQueryClient, useMutation } from 'react-query';
 import {
     Button,
-    CircularProgress,
     FormControl,
     FormLabel,
     Grid,
@@ -32,50 +30,74 @@ import {
     Stack,
     Table,
 } from '@mui/joy';
+import { User } from '../../entities/User.ts';
 import {
-    User,
     UserData,
     UserDeleteInterface,
     UserListParams,
     UserListResponse,
-} from '../../entities/User.ts';
+} from '../../entities/User.types.ts';
 import Typography from '@mui/joy/Typography';
-import { Link as ReactRouterLink } from 'react-router-dom';
+import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { perPageOptions } from '../../constants/pagination.ts';
 import UserListTableSkeleton from '../../components/UserListTableSkeleton.tsx';
 import { useSnackbar } from '../../providers/SnackbarContextProvider.tsx';
 
-const initialParamsValue: UserListParams = {
+export const initialParamsValue: UserListParams = {
     current_page: 1,
-    email: undefined,
-    first_name: undefined,
-    username: undefined,
-    id: undefined,
-    last_name: undefined,
-    mobile: undefined,
+    email: '',
+    first_name: '',
+    username: '',
+    id: null,
+    last_name: '',
+    mobile: '',
     per_page: 15,
 };
 
 const Users = () => {
     const queryClient = useQueryClient();
     const snackBar = useSnackbar();
+    const navigate = useNavigate();
 
     const [params, setParams] = useState<UserListParams>(initialParamsValue);
     const [showFilters, setShowFilters] = useState<boolean>(false);
+    const [usedParamsOnFilter, setUsedParamsOnFilter] =
+        useState<UserListParams>(initialParamsValue);
 
     const fetchData = async () => await User.list(params);
-    const { isLoading, data } = useQuery(['orders', params], fetchData);
+    const { isLoading, data } = useQuery(
+        ['orders', usedParamsOnFilter],
+        fetchData,
+        {
+            staleTime: Infinity,
+        }
+    );
+
+    const invalidateOrdersQuery = async () => {
+        await queryClient.invalidateQueries('orders', {
+            stale: true,
+            exact: false,
+        });
+        setUsedParamsOnFilter(params);
+    };
+
+    const applyFiltersOnKeyUp = async (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            await invalidateOrdersQuery();
+        }
+    };
 
     const updateFilter = (event: ChangeEvent<HTMLInputElement>) => {
         setParams({ ...params, [event.target.name]: event.target.value });
     };
 
-    const updatePagination = (
+    const updatePagination = async (
         field: 'current_page' | 'per_page',
         value: number | undefined
     ) => {
         setParams({ ...params, [field]: value });
+        await invalidateOrdersQuery();
     };
 
     const { mutateAsync: deleteUserFn } = useMutation({
@@ -85,7 +107,7 @@ const Users = () => {
         },
         onSuccess: async (_, variables) => {
             const prevData: UserListResponse | undefined =
-                queryClient.getQueryData(['orders', params]);
+                queryClient.getQueryData(['orders', usedParamsOnFilter]);
 
             if (!prevData) {
                 return;
@@ -100,7 +122,10 @@ const Users = () => {
                 },
             };
 
-            queryClient.setQueryData(['orders', params], updatedData);
+            queryClient.setQueryData(
+                ['orders', usedParamsOnFilter],
+                updatedData
+            );
         },
     });
 
@@ -115,25 +140,6 @@ const Users = () => {
                 snackBar.addError(e.response.data);
             });
     };
-
-    useEffect(() => {
-        queryClient.invalidateQueries('orders', {});
-    }, [params]);
-
-    if (isLoading || !data) {
-        return (
-            <Stack
-                alignItems="center"
-                justifyContent="center"
-                sx={{
-                    width: '100vw',
-                    height: '100vh',
-                }}
-            >
-                <CircularProgress />
-            </Stack>
-        );
-    }
 
     return (
         <Box
@@ -189,6 +195,9 @@ const Users = () => {
                         size="sm"
                         placeholder="Search by username, email or mobile"
                         startDecorator={<SearchIcon />}
+                        onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
+                            applyFiltersOnKeyUp(e)
+                        }
                     />
                 </FormControl>
                 <IconButton
@@ -212,8 +221,11 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>ID</FormLabel>
                         <Input
+                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
+                                applyFiltersOnKeyUp(e)
+                            }
                             size="sm"
-                            value={params.id}
+                            value={params.id ?? ''}
                             name="id"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
                                 updateFilter(e)
@@ -227,6 +239,9 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>First Name</FormLabel>
                         <Input
+                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
+                                applyFiltersOnKeyUp(e)
+                            }
                             size="sm"
                             name="first_name"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -242,6 +257,9 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>Last Name</FormLabel>
                         <Input
+                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
+                                applyFiltersOnKeyUp(e)
+                            }
                             size="sm"
                             name="last_name"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -257,6 +275,9 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>Username</FormLabel>
                         <Input
+                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
+                                applyFiltersOnKeyUp(e)
+                            }
                             size="sm"
                             name="username"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -272,6 +293,9 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>E-mail</FormLabel>
                         <Input
+                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
+                                applyFiltersOnKeyUp(e)
+                            }
                             size="sm"
                             name="email"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -287,6 +311,9 @@ const Users = () => {
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>Mobile</FormLabel>
                         <Input
+                            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) =>
+                                applyFiltersOnKeyUp(e)
+                            }
                             size="sm"
                             name="mobile"
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -377,7 +404,15 @@ const Users = () => {
                                                     alignItems: 'center',
                                                 }}
                                             >
-                                                <EditIcon />
+                                                <IconButton
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/users/${user.id}/edit`
+                                                        )
+                                                    }
+                                                >
+                                                    <EditIcon />
+                                                </IconButton>
                                                 <IconButton
                                                     sx={{
                                                         ':hover': {
@@ -417,6 +452,7 @@ const Users = () => {
                                         ...prev,
                                         per_page: +newValue,
                                     }));
+                                    await invalidateOrdersQuery();
                                 }
                             }}
                         >

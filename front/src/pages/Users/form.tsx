@@ -17,7 +17,11 @@ import {
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import Typography from '@mui/joy/Typography';
-import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
+import {
+    Link as ReactRouterLink,
+    useNavigate,
+    useParams,
+} from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -26,11 +30,17 @@ import { UserSchema } from '../../validators/User.ts';
 import { InfoOutlined } from '@mui/icons-material';
 import { User } from '../../entities/User.ts';
 import { useSnackbar } from '../../providers/SnackbarContextProvider.tsx';
+import {
+    UserCreateResponseError,
+    UserData,
+} from '../../entities/User.types.ts';
 
-const CreateUser = () => {
+const UserForm = () => {
     const [hidePassword, setHidePassword] = useState<boolean>(true);
     const [passwordSecurityLevel, setPasswordSecurityLevel] =
         useState<number>(0);
+    const [user, setUser] = useState<UserData>();
+    const { userId } = useParams();
     const snackbar = useSnackbar();
     const navigate = useNavigate();
 
@@ -47,24 +57,42 @@ const CreateUser = () => {
         },
         validateOnChange: false,
         validateOnBlur: true,
-        validationSchema: UserSchema,
+        validationSchema: UserSchema(!userId),
         onSubmit: (values) => {
-            User.create(values)
+            const isCreating = !user;
+
+            User.createOrUpdate(values)
                 .then((res) => {
                     snackbar.add({
-                        text: `User ${res.data.username} created with successs`,
+                        text: `User ${res.data.username} ${isCreating ? 'created' : 'updated'} with successs`,
                         color: 'success',
                     });
+                    navigate('/users');
                 })
-                .catch(() =>
+                .catch((e: UserCreateResponseError) => {
                     snackbar.add({
-                        text: 'Ops! Something gone wrong',
+                        text:
+                            e.response.status == 422
+                                ? e.response.data.message
+                                : 'Ops! Something gone wrong',
                         color: 'danger',
-                    })
-                );
-            navigate('/users');
+                    });
+                });
         },
     });
+
+    useEffect(() => {
+        if (!userId) {
+            return;
+        }
+
+        User.get(+userId)
+            .then((res) => {
+                setUser(res.data);
+                formik.setValues({ ...res.data, password: '' });
+            })
+            .catch(() => snackbar.addError('Failed to load the user data'));
+    }, []);
 
     useEffect(() => {
         const currentPassword = formik.values.password;
@@ -119,7 +147,7 @@ const CreateUser = () => {
                         </Typography>
                     </Link>
                     <Typography fontWeight={500} fontSize={12}>
-                        Create
+                        {user?.username ?? 'Create'}
                     </Typography>
                 </Breadcrumbs>
             </Box>
@@ -129,7 +157,7 @@ const CreateUser = () => {
                 }}
             >
                 <Typography level="h2" component="h1">
-                    Create user
+                    {user ? `Editing ${user.username}` : 'Create user'}
                 </Typography>
             </Box>
             <Sheet
@@ -195,73 +223,84 @@ const CreateUser = () => {
                             </FormControl>
                         </Grid>
                         <Grid xs={6}>
-                            <FormControl error={!!formik.errors.password}>
-                                <FormLabel>Password</FormLabel>
-                                <Input
-                                    slotProps={{
-                                        input: {
-                                            autoComplete: 'new-password',
-                                            maxLength: 30,
-                                        },
-                                    }}
-                                    placeholder="*****"
-                                    type={hidePassword ? 'password' : 'text'}
-                                    endDecorator={
-                                        <IconButton
-                                            onClick={() =>
-                                                setHidePassword((prev) => !prev)
-                                            }
-                                        >
-                                            {hidePassword ? (
-                                                <VisibilityOffIcon sx={{}} />
-                                            ) : (
-                                                <VisibilityIcon />
-                                            )}
-                                        </IconButton>
-                                    }
-                                    id="password"
-                                    name="password"
-                                    onChange={formik.handleChange}
-                                    value={formik.values.password}
-                                />
-                                {formik.values.password && (
-                                    <>
-                                        <LinearProgress
-                                            determinate
-                                            size="sm"
-                                            value={passwordSecurityLevel}
-                                            sx={{
-                                                bgcolor: 'background.level3',
-                                                color: 'hsl(var(--hue) 80% 40%)',
-                                            }}
-                                        />
-                                        <Typography
-                                            level="body-xs"
-                                            sx={{
-                                                alignSelf: 'flex-end',
-                                                color: 'hsl(var(--hue) 80% 30%)',
-                                            }}
-                                        >
-                                            {passwordSecurityLevel < 30 &&
-                                                'Very weak'}
-                                            {passwordSecurityLevel >= 30 &&
-                                                passwordSecurityLevel < 60 &&
-                                                'Weak'}
-                                            {passwordSecurityLevel >= 60 &&
-                                                passwordSecurityLevel < 100 &&
-                                                'Strong'}
-                                            {passwordSecurityLevel === 100 &&
-                                                'Very strong'}
-                                        </Typography>
-                                    </>
-                                )}
-                                {!!formik.errors.password && (
-                                    <FormHelperText>
-                                        <InfoOutlined />{' '}
-                                        {formik.errors.password}
-                                    </FormHelperText>
-                                )}
-                            </FormControl>
+                            {!userId && (
+                                <FormControl error={!!formik.errors.password}>
+                                    <FormLabel>Password</FormLabel>
+                                    <Input
+                                        slotProps={{
+                                            input: {
+                                                autoComplete: 'new-password',
+                                                maxLength: 30,
+                                            },
+                                        }}
+                                        placeholder="*****"
+                                        type={
+                                            hidePassword ? 'password' : 'text'
+                                        }
+                                        endDecorator={
+                                            <IconButton
+                                                onClick={() =>
+                                                    setHidePassword(
+                                                        (prev) => !prev
+                                                    )
+                                                }
+                                            >
+                                                {hidePassword ? (
+                                                    <VisibilityOffIcon
+                                                        sx={{}}
+                                                    />
+                                                ) : (
+                                                    <VisibilityIcon />
+                                                )}
+                                            </IconButton>
+                                        }
+                                        id="password"
+                                        name="password"
+                                        onChange={formik.handleChange}
+                                        value={formik.values.password}
+                                    />
+                                    {formik.values.password && (
+                                        <>
+                                            <LinearProgress
+                                                determinate
+                                                size="sm"
+                                                value={passwordSecurityLevel}
+                                                sx={{
+                                                    bgcolor:
+                                                        'background.level3',
+                                                    color: 'hsl(var(--hue) 80% 40%)',
+                                                }}
+                                            />
+                                            <Typography
+                                                level="body-xs"
+                                                sx={{
+                                                    alignSelf: 'flex-end',
+                                                    color: 'hsl(var(--hue) 80% 30%)',
+                                                }}
+                                            >
+                                                {passwordSecurityLevel < 30 &&
+                                                    'Very weak'}
+                                                {passwordSecurityLevel >= 30 &&
+                                                    passwordSecurityLevel <
+                                                        60 &&
+                                                    'Weak'}
+                                                {passwordSecurityLevel >= 60 &&
+                                                    passwordSecurityLevel <
+                                                        100 &&
+                                                    'Strong'}
+                                                {passwordSecurityLevel ===
+                                                    100 && 'Very strong'}
+                                            </Typography>
+                                        </>
+                                    )}
+                                    {!!formik.errors.password && (
+                                        <FormHelperText>
+                                            <InfoOutlined />{' '}
+                                            {formik.errors.password}
+                                        </FormHelperText>
+                                    )}
+                                </FormControl>
+                            )}
                         </Grid>
                         <Grid xs={6}>
                             <FormControl error={!!formik.errors.email}>
@@ -315,7 +354,12 @@ const CreateUser = () => {
                         </Grid>
                         <Grid xs={6}>
                             <FormControl error={!!formik.errors.birthday}>
-                                <FormLabel>Birthday</FormLabel>
+                                <FormLabel>
+                                    Birthday{' '}
+                                    <Typography level="body-xs">
+                                        (optional)
+                                    </Typography>
+                                </FormLabel>
                                 <Input
                                     slotProps={{
                                         input: {
@@ -327,7 +371,7 @@ const CreateUser = () => {
                                     id="birthday"
                                     name="birthday"
                                     onChange={formik.handleChange}
-                                    value={formik.values.birthday}
+                                    value={formik.values.birthday ?? ''}
                                 />
                                 {!!formik.errors.birthday && (
                                     <FormHelperText>
@@ -367,7 +411,9 @@ const CreateUser = () => {
                         <Link component={ReactRouterLink} to="/users">
                             <Button variant="plain">Cancel</Button>
                         </Link>
-                        <Button type="submit">Create</Button>
+                        <Button type="submit">
+                            {userId ? 'Update' : 'Create'}
+                        </Button>
                     </Stack>
                 </form>
             </Sheet>
@@ -375,4 +421,4 @@ const CreateUser = () => {
     );
 };
 
-export default CreateUser;
+export default UserForm;

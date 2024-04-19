@@ -3,12 +3,15 @@ import { Auth } from '../../entities/Auth.ts';
 import { useState } from 'react';
 import { Form, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthContextProvider.tsx';
+import { useSnackbar } from '../../providers/SnackbarContextProvider.tsx';
 
 const Login = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const navigate = useNavigate();
     const { isAuthenticated, setIsAuthenticated } = useAuth();
+
+    const snackBar = useSnackbar();
 
     if (isAuthenticated) {
         return <Navigate to="/" />;
@@ -28,7 +31,10 @@ const Login = () => {
                 setIsAuthenticated(true);
                 navigate('/');
             })
-            .catch((e) => console.error(e));
+            .catch((e) => {
+                console.error(e);
+                snackBar.addError(e.message);
+            });
     };
 
     return (
