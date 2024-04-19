@@ -25,6 +25,7 @@ import {
     Grid,
     IconButton,
     Input,
+    Link,
     Option,
     Select,
     Sheet,
@@ -349,21 +350,26 @@ const Users = () => {
                                                 </Typography>
                                             </td>
                                             <td>
-                                                <Typography
-                                                    level="body-sm"
-                                                    endDecorator={
-                                                        user.is_admin && (
-                                                            <Chip
-                                                                size="sm"
-                                                                color="primary"
-                                                            >
-                                                                admin
-                                                            </Chip>
-                                                        )
-                                                    }
+                                                <Link
+                                                    component={ReactRouterLink}
+                                                    to={`/users/${user.id}`}
                                                 >
-                                                    {user.username}{' '}
-                                                </Typography>
+                                                    <Typography
+                                                        level="body-sm"
+                                                        endDecorator={
+                                                            user.is_admin && (
+                                                                <Chip
+                                                                    size="sm"
+                                                                    color="primary"
+                                                                >
+                                                                    admin
+                                                                </Chip>
+                                                            )
+                                                        }
+                                                    >
+                                                        {user.username}{' '}
+                                                    </Typography>
+                                                </Link>
                                             </td>
                                             <td>
                                                 <Typography level="body-sm">
