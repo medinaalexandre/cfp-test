@@ -1,26 +1,95 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, SyntheticEvent, useEffect, useState } from 'react';
 import { User } from '../../entities/User.ts';
 import {
     Link as ReactRouterLink,
     useNavigate,
     useParams,
 } from 'react-router-dom';
-import { UserResource } from '../../entities/User.types.ts';
+import { UserViewResource } from '../../entities/User.types.ts';
 import { useSnackbar } from '../../providers/SnackbarContextProvider.tsx';
-import { Box, Button, CircularProgress, Link, Stack } from '@mui/joy';
+import {
+    Box,
+    Button,
+    Chip,
+    ChipDelete,
+    CircularProgress,
+    DialogActions,
+    DialogContent,
+    FormControl,
+    FormLabel,
+    Link,
+    Modal,
+    ModalDialog,
+    Option,
+    Select,
+    Stack,
+} from '@mui/joy';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import Typography from '@mui/joy/Typography';
-import InfoIcon from '@mui/icons-material/Info';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import Sheet from '@mui/joy/Sheet';
-import { NavigateBefore, Security } from '@mui/icons-material';
+import {
+    AccountBox,
+    AddCircle,
+    AddModerator,
+    NavigateBefore,
+    Security,
+} from '@mui/icons-material';
+import { useQuery } from '@tanstack/react-query';
+import { Role as RoleEntity } from '../../entities/Role.ts';
+import { Role } from '../../entities/Role.types.ts';
 
 const UserView = () => {
-    const [user, setUser] = useState<UserResource>();
+    const [user, setUser] = useState<UserViewResource>({} as UserViewResource);
+    const [roleToDelete, setRoleToDelete] = useState<Role>();
+    const [roleToAdd, setRoleToAdd] = useState<Role>();
+    const [isAddRoleModalOpen, setIsAddRoleModalOpen] =
+        useState<boolean>(false);
     const { userId } = useParams();
     const snackBar = useSnackbar();
     const navigate = useNavigate();
+
+    const fetchRoles = async () => await RoleEntity.list();
+    const { data: roles } = useQuery({
+        queryKey: ['roles'],
+        queryFn: fetchRoles,
+        staleTime: 60 * 1000,
+    });
+
+    const addRole = () => {
+        if (!user || !roleToAdd) {
+            return;
+        }
+
+        User.addRole(user.id, roleToAdd.id)
+            .then(() => {
+                setUser((prev) => ({
+                    ...prev,
+                    roles: [...prev.roles, roleToAdd],
+                }));
+                snackBar.addSuccess(`Role ${roleToAdd.name} added`);
+                setRoleToAdd(undefined);
+                setIsAddRoleModalOpen(false);
+            })
+            .catch((e) => snackBar.addError(e.response.data));
+    };
+
+    const removeRole = () => {
+        if (!user || !roleToDelete) {
+            return;
+        }
+
+        User.deleteRole(user.id, roleToDelete.id)
+            .then(() => {
+                setUser((prev) => ({
+                    ...prev,
+                    roles: prev.roles.filter((i) => i.id !== roleToDelete.id),
+                }));
+            })
+            .catch((e) => snackBar.addError(e.message))
+            .finally(() => setRoleToDelete(undefined));
+    };
 
     useEffect(() => {
         if (!userId) {
@@ -103,7 +172,7 @@ const UserView = () => {
                 <Stack direction="row" gap={4} sx={{}}>
                     <div>
                         <Typography level="title-lg" sx={{ mb: 2 }}>
-                            About <InfoIcon />
+                            About <AccountBox />
                         </Typography>
                         <Typography>
                             <b>First name:</b> {user.first_name}
@@ -112,7 +181,8 @@ const UserView = () => {
                             <b>Last name:</b> {user.last_name}
                         </Typography>
                         <Typography>
-                            <b>Birthday:</b> {user.birthday ?? '-'}
+                            <b>Birthday:</b>{' '}
+                            {user.birthday ? user.birthday : '-'}
                         </Typography>
                     </div>
                     <div>
@@ -123,7 +193,7 @@ const UserView = () => {
                             <b>E-mail:</b> {user.email}
                         </Typography>
                         <Typography>
-                            <b>Mobile:</b> {user.mobile ?? '-'}
+                            <b>Mobile:</b> {user.mobile ? user.mobile : '-'}
                         </Typography>
                     </div>
                     <div>
@@ -133,6 +203,28 @@ const UserView = () => {
                         <Typography>
                             <b>Admin:</b> {user.is_admin ? 'Yes' : 'No'}
                         </Typography>
+                        <Stack gap={2} direction="row">
+                            <Typography>
+                                <b>Credentials:</b>
+                            </Typography>
+                            {user.roles?.length
+                                ? user.roles.map((role) => (
+                                      <Chip
+                                          key={role.id}
+                                          color="primary"
+                                          endDecorator={
+                                              <ChipDelete
+                                                  onDelete={() =>
+                                                      setRoleToDelete(role)
+                                                  }
+                                              />
+                                          }
+                                      >
+                                          {role.name}
+                                      </Chip>
+                                  ))
+                                : '-'}
+                        </Stack>
                     </div>
                 </Stack>
                 <div>
@@ -145,8 +237,94 @@ const UserView = () => {
                     >
                         Back to the list
                     </Button>
+                    <Button
+                        variant="soft"
+                        startDecorator={<AddModerator />}
+                        sx={{ ml: 2, minWidth: 159 }}
+                        onClick={() => setIsAddRoleModalOpen(true)}
+                    >
+                        Add role
+                    </Button>
                 </div>
             </Sheet>
+            <Modal
+                open={!!roleToDelete}
+                onClose={() => setRoleToDelete(undefined)}
+            >
+                <ModalDialog variant="outlined" role="alertdialog">
+                    <DialogContent>
+                        <Box>
+                            <Typography>
+                                Are you sure you want to remove role{' '}
+                                <b>{roleToDelete?.name}</b> from{' '}
+                                <b>{user.username}</b>
+                            </Typography>
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            variant="solid"
+                            color="danger"
+                            onClick={removeRole}
+                        >
+                            Remove role
+                        </Button>
+                        <Button
+                            variant="plain"
+                            color="neutral"
+                            onClick={() => setRoleToDelete(undefined)}
+                        >
+                            Cancel
+                        </Button>
+                    </DialogActions>
+                </ModalDialog>
+            </Modal>
+            <Modal
+                open={isAddRoleModalOpen}
+                onClose={() => setIsAddRoleModalOpen(false)}
+            >
+                <ModalDialog>
+                    <DialogContent
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'flex-end',
+                        }}
+                    >
+                        <FormControl sx={{ flexGrow: 1 }}>
+                            <FormLabel>
+                                <Typography>Select a role</Typography>
+                            </FormLabel>
+                            <Select
+                                onChange={(
+                                    event: SyntheticEvent | null,
+                                    newValue
+                                ) => {
+                                    if (!event || !newValue) {
+                                        return;
+                                    }
+                                    const { target } =
+                                        event as ChangeEvent<HTMLInputElement>;
+
+                                    setRoleToAdd({
+                                        id: +newValue,
+                                        name: target.innerText,
+                                    });
+                                }}
+                            >
+                                {roles?.data.map((i) => (
+                                    <Option key={i.id} value={i.id}>
+                                        {i.name}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <Button variant="plain" onClick={addRole}>
+                            <AddCircle />
+                        </Button>
+                    </DialogContent>
+                </ModalDialog>
+            </Modal>
         </Box>
     );
 };

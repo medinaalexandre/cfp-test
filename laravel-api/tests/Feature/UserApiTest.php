@@ -103,3 +103,16 @@ it('can remove a role from a user', function () {
 
     expect($user->roles()->count())->toBe(0);
 });
+
+it('cannot add a role that the user already have', function () {
+    $role = Role::factory()->create();
+    $user = User::factory()
+        ->hasAttached($role)
+        ->create();
+
+    $res = $this->postJson("/api/users/{$user->getKey()}/roles/add", [
+        'role_id' => $role->getKey(),
+    ]);
+
+    dd($res);
+});

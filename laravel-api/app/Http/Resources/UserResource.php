@@ -8,7 +8,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
 {
-
     public function __construct($resource, protected bool $addRoles = false)
     {
         parent::__construct($resource);
@@ -19,7 +18,7 @@ class UserResource extends JsonResource
         /** @var User $user */
         $user = $this->resource;
 
-        $data =  [
+        $data = [
             'id' => $user->getKey(),
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,

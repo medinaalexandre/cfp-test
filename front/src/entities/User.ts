@@ -6,7 +6,7 @@ import {
     UserDeleteInterface,
     UserListParams,
     UserListResponse,
-    UserResponse,
+    UserViewResponse,
 } from './User.types.ts';
 
 class UserEntity {
@@ -24,7 +24,7 @@ class UserEntity {
 
     get = async (id: number) => {
         return await Api.get(`/api/users/${id}`).then(
-            (res: AxiosResponse<UserResponse>) => res.data
+            (res: AxiosResponse<UserViewResponse>) => res.data
         );
     };
 
@@ -50,6 +50,16 @@ class UserEntity {
 
     delete = async ({ id }: UserDeleteInterface) => {
         return await Api.delete(`/api/users/${id}`);
+    };
+
+    addRole = async (user_id: number, role_id: number) => {
+        return await Api.post(`/api/users/${user_id}/roles/add`, {
+            role_id,
+        });
+    };
+
+    deleteRole = async (user_id: number, role_id: number) => {
+        return await Api.delete(`/api/users/${user_id}/roles/${role_id}`);
     };
 }
 

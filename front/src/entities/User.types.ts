@@ -1,3 +1,5 @@
+import { Role } from './Role.types.ts';
+
 export interface CommonUser {
     first_name: string;
     last_name: string;
@@ -15,15 +17,6 @@ export interface UserResource extends CommonUser {
 export interface UserRequest extends CommonUser {
     id?: number;
     password: string;
-}
-
-export interface UserResponse {
-    data: UserResource;
-}
-
-interface Role {
-    id: number;
-    name: string;
 }
 
 export interface UserViewResource extends UserResource {
