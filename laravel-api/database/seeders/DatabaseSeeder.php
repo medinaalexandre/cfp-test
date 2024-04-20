@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
+            'is_admin' => true,
             'email' => 'admin@cfp.com',
             'password' => Hash::make('P@ssword123!'),
         ]);

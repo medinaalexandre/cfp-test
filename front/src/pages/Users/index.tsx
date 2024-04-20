@@ -16,16 +16,22 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import PersonIcon from '@mui/icons-material/Person';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import EmailIcon from '@mui/icons-material/Email';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import {
     Button,
     Chip,
+    Divider,
+    Dropdown,
     FormControl,
     FormLabel,
     Grid,
     IconButton,
     Input,
     Link,
+    Menu,
+    MenuButton,
+    MenuItem,
     Option,
     Select,
     Sheet,
@@ -45,6 +51,8 @@ import { useState } from 'react';
 import { perPageOptions } from '../../constants/pagination.ts';
 import UserListTableSkeleton from '../../components/UserListTableSkeleton.tsx';
 import { useSnackbar } from '../../providers/SnackbarContextProvider.tsx';
+import { isMobile } from 'react-device-detect';
+import { MoreVert } from '@mui/icons-material';
 
 export const initialParamsValue: UserListParams = {
     current_page: 1,
@@ -142,12 +150,228 @@ const Users = () => {
             });
     };
 
+    const renderMobileUserList = () => (
+        <>
+            {data?.data.map((user) => (
+                <>
+                    <Box sx={{ p: 2, position: 'relative' }} key={user.id}>
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: 12,
+                                right: 5,
+                            }}
+                        >
+                            <Dropdown>
+                                <MenuButton
+                                    slots={{ root: IconButton }}
+                                    slotProps={{
+                                        root: {
+                                            variant: 'plain',
+                                            color: 'neutral',
+                                        },
+                                    }}
+                                >
+                                    <MoreVert />
+                                </MenuButton>
+                                <Menu placement="bottom-end">
+                                    <MenuItem>
+                                        <IconButton
+                                            size="sm"
+                                            onClick={() =>
+                                                navigate(`/users/${user.id}`)
+                                            }
+                                        >
+                                            <ArrowForwardIosIcon />
+                                            <Typography
+                                                style={{ marginLeft: 5 }}
+                                            >
+                                                View
+                                            </Typography>
+                                        </IconButton>
+                                    </MenuItem>
+                                    <MenuItem>
+                                        <IconButton
+                                            size="sm"
+                                            onClick={() =>
+                                                navigate(
+                                                    `/users/${user.id}/edit`
+                                                )
+                                            }
+                                        >
+                                            <EditIcon />
+                                            <Typography
+                                                style={{ marginLeft: 5 }}
+                                            >
+                                                Edit
+                                            </Typography>
+                                        </IconButton>
+                                    </MenuItem>
+                                    <MenuItem>
+                                        <IconButton
+                                            size="sm"
+                                            onClick={() =>
+                                                handleDeleteUser(user)
+                                            }
+                                        >
+                                            <DeleteIcon />
+                                            <Typography
+                                                style={{ marginLeft: 5 }}
+                                            >
+                                                Delete
+                                            </Typography>
+                                        </IconButton>
+                                    </MenuItem>
+                                </Menu>
+                            </Dropdown>
+                        </div>
+
+                        <Link
+                            component={ReactRouterLink}
+                            to={`/users/${user.id}`}
+                        >
+                            <Typography
+                                endDecorator={
+                                    user.is_admin && (
+                                        <Chip size="sm" color="primary">
+                                            admin
+                                        </Chip>
+                                    )
+                                }
+                            >
+                                {user.id} - <b>{user.username}</b>
+                            </Typography>
+                        </Link>
+
+                        <Typography sx={{ pb: 2 }} level="body-sm">
+                            {user.first_name} {user.last_name}{' '}
+                            {!!user.birthday && `(${user.birthday})`}
+                        </Typography>
+                        <Typography>
+                            <EmailIcon /> {user.email}
+                        </Typography>
+                        <Typography>
+                            <PhoneIphoneIcon /> {user.mobile}
+                        </Typography>
+                    </Box>
+                    <Divider sx={{ m: 1 }} />
+                </>
+            ))}
+        </>
+    );
+    const renderTableList = () => (
+        <Table
+            stickyHeader
+            stickyFooter
+            stripe="odd"
+            hoverRow
+            sx={{ overflowX: 'scroll' }}
+        >
+            <thead>
+                <tr>
+                    <th style={{ width: 40 }}>ID</th>
+                    <th>Username</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Mobile</th>
+                    <th>E-mail</th>
+                    <th style={{ width: 100 }}>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {isLoading ? (
+                    <UserListTableSkeleton lines={params.per_page} />
+                ) : (
+                    <>
+                        {data?.data.map((user: UserResource) => (
+                            <tr key={user.id}>
+                                <td>
+                                    <Typography level="body-sm">
+                                        {user.id}
+                                    </Typography>
+                                </td>
+                                <td>
+                                    <Link
+                                        component={ReactRouterLink}
+                                        to={`/users/${user.id}`}
+                                    >
+                                        <Typography
+                                            level="body-sm"
+                                            endDecorator={
+                                                user.is_admin && (
+                                                    <Chip
+                                                        size="sm"
+                                                        color="primary"
+                                                    >
+                                                        admin
+                                                    </Chip>
+                                                )
+                                            }
+                                        >
+                                            {user.username}{' '}
+                                        </Typography>
+                                    </Link>
+                                </td>
+                                <td>
+                                    <Typography level="body-sm">
+                                        {user.first_name}
+                                    </Typography>
+                                </td>
+                                <td>
+                                    <Typography level="body-sm">
+                                        {user.last_name}
+                                    </Typography>
+                                </td>
+                                <td>
+                                    <Typography level="body-sm">
+                                        {user.mobile}
+                                    </Typography>
+                                </td>
+                                <td
+                                    style={{
+                                        textOverflow: 'ellipsis',
+                                        overflow: 'hidden',
+                                    }}
+                                >
+                                    <Typography level="body-sm">
+                                        {user.email}
+                                    </Typography>
+                                </td>
+                                <td>
+                                    <IconButton
+                                        onClick={() =>
+                                            navigate(`/users/${user.id}/edit`)
+                                        }
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        sx={{
+                                            ':hover': {
+                                                backgroundColor:
+                                                    'var(--joy-palette-danger-800)',
+                                                color: 'var(--joy-palette-danger-300)',
+                                            },
+                                        }}
+                                        onClick={() => handleDeleteUser(user)}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </td>
+                            </tr>
+                        ))}
+                    </>
+                )}
+            </tbody>
+        </Table>
+    );
+
     return (
         <Box
             sx={{
                 height: '100dvh',
-                px: 4,
-                py: 4,
+                px: isMobile ? 2 : 4,
+                py: isMobile ? 0 : 4,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 1,
@@ -172,8 +396,8 @@ const Users = () => {
                     display: 'flex',
                     mb: 1,
                     gap: 1,
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: { xs: 'start', sm: 'center' },
+                    flexDirection: 'row',
+                    alignItems: 'center',
                     flexWrap: 'wrap',
                     justifyContent: 'space-between',
                 }}
@@ -206,8 +430,12 @@ const Users = () => {
                     sx={{ ml: 2 }}
                     onClick={() => setShowFilters((prev) => !prev)}
                 >
-                    <FilterAltIcon />{' '}
-                    <Typography level="body-md">Filters</Typography>
+                    <FilterAltIcon />
+                    {isMobile ? (
+                        ''
+                    ) : (
+                        <Typography level="body-md">Filters</Typography>
+                    )}
                 </IconButton>
             </Stack>
             <Grid
@@ -219,7 +447,7 @@ const Users = () => {
                     mb: 1,
                 }}
             >
-                <Grid xs={2}>
+                <Grid xs={6} md={2}>
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>ID</FormLabel>
                         <Input
@@ -234,7 +462,7 @@ const Users = () => {
                         />
                     </FormControl>
                 </Grid>
-                <Grid xs={2}>
+                <Grid xs={6} md={2}>
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>First Name</FormLabel>
                         <Input
@@ -249,7 +477,7 @@ const Users = () => {
                         />
                     </FormControl>
                 </Grid>
-                <Grid xs={2}>
+                <Grid xs={6} md={2}>
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>Last Name</FormLabel>
                         <Input
@@ -264,7 +492,7 @@ const Users = () => {
                         />
                     </FormControl>
                 </Grid>
-                <Grid xs={2}>
+                <Grid xs={6} md={2}>
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>Username</FormLabel>
                         <Input
@@ -279,7 +507,7 @@ const Users = () => {
                         />
                     </FormControl>
                 </Grid>
-                <Grid xs={2}>
+                <Grid xs={6} md={2}>
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>E-mail</FormLabel>
                         <Input
@@ -294,7 +522,7 @@ const Users = () => {
                         />
                     </FormControl>
                 </Grid>
-                <Grid xs={2}>
+                <Grid xs={6} md={2}>
                     <FormControl sx={{ flex: 1 }} size="sm">
                         <FormLabel>Mobile</FormLabel>
                         <Input
@@ -317,120 +545,12 @@ const Users = () => {
                         borderRadius: 'sm',
                     }}
                 >
-                    <Table
-                        stickyHeader
-                        stickyFooter
-                        stripe="odd"
-                        hoverRow
-                        sx={{ overflowX: 'scroll' }}
-                    >
-                        <thead>
-                            <tr>
-                                <th style={{ width: 40 }}>ID</th>
-                                <th>Username</th>
-                                <th>First name</th>
-                                <th>Last name</th>
-                                <th>Mobile</th>
-                                <th>E-mail</th>
-                                <th style={{ width: 100 }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {isLoading ? (
-                                <UserListTableSkeleton
-                                    lines={params.per_page}
-                                />
-                            ) : (
-                                <>
-                                    {data?.data.map((user: UserResource) => (
-                                        <tr key={user.id}>
-                                            <td>
-                                                <Typography level="body-sm">
-                                                    {user.id}
-                                                </Typography>
-                                            </td>
-                                            <td>
-                                                <Link
-                                                    component={ReactRouterLink}
-                                                    to={`/users/${user.id}`}
-                                                >
-                                                    <Typography
-                                                        level="body-sm"
-                                                        endDecorator={
-                                                            user.is_admin && (
-                                                                <Chip
-                                                                    size="sm"
-                                                                    color="primary"
-                                                                >
-                                                                    admin
-                                                                </Chip>
-                                                            )
-                                                        }
-                                                    >
-                                                        {user.username}{' '}
-                                                    </Typography>
-                                                </Link>
-                                            </td>
-                                            <td>
-                                                <Typography level="body-sm">
-                                                    {user.first_name}
-                                                </Typography>
-                                            </td>
-                                            <td>
-                                                <Typography level="body-sm">
-                                                    {user.last_name}
-                                                </Typography>
-                                            </td>
-                                            <td>
-                                                <Typography level="body-sm">
-                                                    {user.mobile}
-                                                </Typography>
-                                            </td>
-                                            <td
-                                                style={{
-                                                    textOverflow: 'ellipsis',
-                                                    overflow: 'hidden',
-                                                }}
-                                            >
-                                                <Typography level="body-sm">
-                                                    {user.email}
-                                                </Typography>
-                                            </td>
-                                            <td>
-                                                <IconButton
-                                                    onClick={() =>
-                                                        navigate(
-                                                            `/users/${user.id}/edit`
-                                                        )
-                                                    }
-                                                >
-                                                    <EditIcon />
-                                                </IconButton>
-                                                <IconButton
-                                                    sx={{
-                                                        ':hover': {
-                                                            backgroundColor:
-                                                                'var(--joy-palette-danger-800)',
-                                                            color: 'var(--joy-palette-danger-300)',
-                                                        },
-                                                    }}
-                                                    onClick={() =>
-                                                        handleDeleteUser(user)
-                                                    }
-                                                >
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </>
-                            )}
-                        </tbody>
-                    </Table>
+                    {isMobile ? renderMobileUserList() : renderTableList()}
                 </Sheet>
                 <Stack
                     sx={{ py: 2 }}
                     direction="row"
+                    flexWrap="wrap"
                     justifyContent="space-between"
                 >
                     <Stack direction="row" alignItems="center">
@@ -479,7 +599,7 @@ const Users = () => {
                                 )
                             }
                         >
-                            Previous
+                            {!isMobile && 'Previous'}
                         </Button>
                         <Input
                             size="sm"
@@ -516,7 +636,7 @@ const Users = () => {
                                 )
                             }
                         >
-                            Next
+                            {!isMobile && 'Next'}
                         </Button>
                         <IconButton
                             color="primary"
