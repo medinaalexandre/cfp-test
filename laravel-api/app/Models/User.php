@@ -7,6 +7,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
@@ -52,6 +53,9 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder|User whereUsername($value)
  * @method static Builder|User whereIsAdmin($value)
  *
+ * @property-read Collection<int, \App\Models\Role> $roles
+ * @property-read int|null $roles_count
+ *
  * @mixin Eloquent
  */
 class User extends Authenticatable
@@ -89,4 +93,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class);
+    }
 }

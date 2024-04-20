@@ -3,6 +3,10 @@
 use App\Http\Controllers\Auth\CheckController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Role\RoleCreateController;
+use App\Http\Controllers\Role\RoleListController;
+use App\Http\Controllers\User\Roles\UserAddRoleController;
+use App\Http\Controllers\User\Roles\UserDeleteRoleController;
 use App\Http\Controllers\User\UserCreateController;
 use App\Http\Controllers\User\UserDeleteController;
 use App\Http\Controllers\User\UserEditController;
@@ -34,5 +38,10 @@ Route::middleware(['api', 'auth:sanctum', 'web'])->group(function () {
         Route::get('/', UserViewController::class);
         Route::put('/', UserEditController::class);
         Route::delete('/', UserDeleteController::class);
+        Route::post('/roles/add', UserAddRoleController::class);
+        Route::delete('/roles/{role}', UserDeleteRoleController::class);
     });
+
+    Route::get('/roles', RoleListController::class);
+    Route::post('/roles', RoleCreateController::class);
 });

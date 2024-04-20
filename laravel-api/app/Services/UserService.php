@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Role;
 use App\Models\User;
 use Hash;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -43,5 +44,20 @@ class UserService
         Gate::authorize('delete', $user);
 
         $user->delete();
+    }
+
+    public function addRole(User $user, Role $role): void
+    {
+        $user->roles()->attach($role);
+    }
+
+    public function removeRole(User $user, Role $role): void
+    {
+        $user->roles()->detach($role);
+    }
+
+    public function syncRoles(User $user, array $roleIds): void
+    {
+        $user->roles()->sync($roleIds);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -70,3 +71,39 @@ it('cannot delete itself', function () {
     $this->actingAs($user);
     $this->service->delete($user);
 })->throws(AuthorizationException::class, 'You cannot delete yourself.');
+
+it('can add a user to a role', function () {
+    $user = User::factory()->create();
+    $role = Role::factory()->create();
+
+    $this->service->addRole($user, $role);
+
+    expect($user->roles->count())->toBeOne()
+        ->and($user->roles[0]->getKey())->toBe($role->getKey());
+});
+
+it('can remove a role from a user', function () {
+    $user = User::factory()
+        ->hasAttached(
+            Role::factory()->createMany(2)
+        )
+        ->create();
+
+    $toRemove = $user->roles[0];
+
+    $this->service->removeRole($user, $toRemove);
+
+    expect($user->roles()->count())->toBeOne()
+        ->and($user->roles()->where('role_id', $toRemove->getKey())->count())->toBeEmpty();
+});
+
+it('can sync user roles', function () {
+    $user = User::factory()->create();
+    $roles = Role::factory()->createMany(2);
+    $rolesIds = $roles->pluck('id')->toarray();
+
+    $this->service->syncRoles($user, $rolesIds);
+
+    expect($user->roles()->pluck('role_id')->toArray())
+        ->toBe($rolesIds);
+});

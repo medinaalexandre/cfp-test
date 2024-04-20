@@ -1,10 +1,11 @@
 <?php
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Testing\TestResponse;
 
 beforeEach(function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->create(['is_admin' => true]));
 });
 
 it('validate the request on create', function (array $requestData) {
@@ -80,4 +81,25 @@ it('cannot update the email to a existing one', function () {
 
     $res->assertUnprocessable()
         ->assertJsonPath('message', 'The email has already been taken.');
+});
+
+it('can add a role to a user', function () {
+    $user = User::factory()->create();
+    $role = Role::factory()->create();
+
+    $this->postJson("/api/users/{$user->getKey()}/roles/add", [
+        'role_id' => $role->getKey(),
+    ])->assertNoContent();
+
+    expect($user->roles[0]->getKey())->toBe($role->getKey());
+});
+
+it('can remove a role from a user', function () {
+    $user = User::factory()->create();
+    $role = Role::factory()->create();
+
+    $this->delete("/api/users/{$user->getKey()}/roles/{$role->getKey()}")
+        ->assertNocontent();
+
+    expect($user->roles()->count())->toBe(0);
 });
