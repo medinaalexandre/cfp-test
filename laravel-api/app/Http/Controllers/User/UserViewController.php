@@ -10,6 +10,6 @@ class UserViewController extends Controller
 {
     public function __invoke(User $user): UserResource
     {
-        return UserResource::make($user);
+        return UserResource::make($user, true);
     }
 }

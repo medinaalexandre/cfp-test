@@ -8,12 +8,18 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
 {
+
+    public function __construct($resource, protected bool $addRoles = false)
+    {
+        parent::__construct($resource);
+    }
+
     public function toArray(Request $request): array
     {
         /** @var User $user */
         $user = $this->resource;
 
-        return [
+        $data =  [
             'id' => $user->getKey(),
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
@@ -23,5 +29,11 @@ class UserResource extends JsonResource
             'is_admin' => $user->is_admin,
             'birthday' => $user->birthday?->toDateString() ?? '',
         ];
+
+        if ($this->addRoles) {
+            $data['roles'] = RoleResource::collection($user->roles);
+        }
+
+        return $data;
     }
 }

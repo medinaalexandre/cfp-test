@@ -34,7 +34,7 @@ import {
 } from '@mui/joy';
 import { User } from '../../entities/User.ts';
 import {
-    UserData,
+    UserResource,
     UserDeleteInterface,
     UserListParams,
     UserListResponse,
@@ -130,7 +130,7 @@ const Users = () => {
         },
     });
 
-    const handleDeleteUser = (user: UserData) => {
+    const handleDeleteUser = (user: UserResource) => {
         deleteUserFn({
             id: user.id,
         })
@@ -342,7 +342,7 @@ const Users = () => {
                                 />
                             ) : (
                                 <>
-                                    {data?.data.map((user: UserData) => (
+                                    {data?.data.map((user: UserResource) => (
                                         <tr key={user.id}>
                                             <td>
                                                 <Typography level="body-sm">

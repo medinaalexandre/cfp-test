@@ -1,7 +1,7 @@
 import Api from '../services/api.ts';
 import { AxiosResponse } from 'axios';
 import {
-    CreateOrUpdateUser,
+    UserRequest,
     UserCreateOrUpdateResponse,
     UserDeleteInterface,
     UserListParams,
@@ -28,7 +28,7 @@ class UserEntity {
         );
     };
 
-    createOrUpdate = async (params: CreateOrUpdateUser) => {
+    createOrUpdate = async (params: UserRequest) => {
         if (params.id) {
             return await this.update(params);
         }
@@ -36,13 +36,13 @@ class UserEntity {
         return await this.create(params);
     };
 
-    create = async (params: CreateOrUpdateUser) => {
+    create = async (params: UserRequest) => {
         return await Api.post('/api/users', { ...params }).then(
             (res: AxiosResponse<UserCreateOrUpdateResponse>) => res.data
         );
     };
 
-    update = async (params: CreateOrUpdateUser) => {
+    update = async (params: UserRequest) => {
         return await Api.put(`/api/users/${params.id}`, { ...params }).then(
             (res: AxiosResponse<UserCreateOrUpdateResponse>) => res.data
         );

@@ -32,14 +32,14 @@ import { User } from '../../entities/User.ts';
 import { useSnackbar } from '../../providers/SnackbarContextProvider.tsx';
 import {
     UserCreateResponseError,
-    UserData,
+    UserResource,
 } from '../../entities/User.types.ts';
 
 const UserForm = () => {
     const [hidePassword, setHidePassword] = useState<boolean>(true);
     const [passwordSecurityLevel, setPasswordSecurityLevel] =
         useState<number>(0);
-    const [user, setUser] = useState<UserData>();
+    const [user, setUser] = useState<UserResource>();
     const { userId } = useParams();
     const snackbar = useSnackbar();
     const navigate = useNavigate();

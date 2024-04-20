@@ -8,21 +8,34 @@ export interface CommonUser {
     is_admin: boolean;
 }
 
-export interface UserData extends CommonUser {
+export interface UserResource extends CommonUser {
     id: number;
 }
 
-export interface CreateOrUpdateUser extends CommonUser {
+export interface UserRequest extends CommonUser {
     id?: number;
     password: string;
 }
 
 export interface UserResponse {
-    data: UserData;
+    data: UserResource;
+}
+
+interface Role {
+    id: number;
+    name: string;
+}
+
+export interface UserViewResource extends UserResource {
+    roles: Array<Role>;
+}
+
+export interface UserViewResponse {
+    data: UserViewResource;
 }
 
 export interface UserListResponse {
-    data: Array<UserData>;
+    data: Array<UserResource>;
     meta: {
         current_page: number;
         from: number;
@@ -34,7 +47,7 @@ export interface UserListResponse {
 }
 
 export interface UserCreateOrUpdateResponse {
-    data: UserData;
+    data: UserResource;
 }
 
 export interface UserListParams {

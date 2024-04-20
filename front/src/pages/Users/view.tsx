@@ -5,7 +5,7 @@ import {
     useNavigate,
     useParams,
 } from 'react-router-dom';
-import { UserData } from '../../entities/User.types.ts';
+import { UserResource } from '../../entities/User.types.ts';
 import { useSnackbar } from '../../providers/SnackbarContextProvider.tsx';
 import { Box, Button, CircularProgress, Link, Stack } from '@mui/joy';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
@@ -17,7 +17,7 @@ import Sheet from '@mui/joy/Sheet';
 import { NavigateBefore, Security } from '@mui/icons-material';
 
 const UserView = () => {
-    const [user, setUser] = useState<UserData>();
+    const [user, setUser] = useState<UserResource>();
     const { userId } = useParams();
     const snackBar = useSnackbar();
     const navigate = useNavigate();
