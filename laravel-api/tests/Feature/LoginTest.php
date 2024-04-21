@@ -31,6 +31,20 @@ it('can login with valid email and password', function () {
         ->assertCookie('auth_token');
 });
 
+it('receives unauthorized with wrong email', function () {
+    $this->postJson('/api/login', [
+        'email' => $this->email.'m',
+        'password' => $this->password,
+    ])->assertUnauthorized();
+});
+
+it('receives unauthorized with wrong password', function () {
+    $this->postJson('/api/login', [
+        'email' => $this->email,
+        'password' => $this->password.'w',
+    ])->assertUnauthorized();
+});
+
 it('receive unauthorized when gives wrong credentials', function () {
     $this->postJson('/api/login', [
         'email' => $this->email,
@@ -42,4 +56,17 @@ it('can logout', function () {
     $this->actingAs(User::factory()->create());
     $this->post('/api/logout')
         ->assertNoContent();
+});
+
+it('can check if the user is logged', function () {
+    $this->actingAs(User::factory()->create());
+    $this->get('/api/check')
+        ->assertOk();
+});
+
+it('deny check if the user is not logged', function () {
+    $this->withHeaders([
+        'accept' => 'application/json',
+    ])->get('/api/check')
+        ->assertUnauthorized();
 });

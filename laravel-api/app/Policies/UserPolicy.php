@@ -26,9 +26,4 @@ class UserPolicy
 
         return Response::allow();
     }
-
-    public function forceDelete(User $user, User $model): Response
-    {
-        return $this->delete($user, $model);
-    }
 }

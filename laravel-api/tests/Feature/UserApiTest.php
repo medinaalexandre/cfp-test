@@ -43,6 +43,48 @@ it('can get a single user', function () {
         ->assertJsonPath('data.id', $user->getKey());
 });
 
+it('can create a user', function () {
+    $this->post('/api/users', [
+        'first_name' => 'Test 1',
+        'username' => 'test1',
+        'last_name' => 'tester 2',
+        'email' => 'tester@test.com',
+        'password' => 'P4ssword@!@#',
+    ])->assertCreated();
+});
+
+it('can delete a user', function () {
+    $user = User::factory()->create();
+    $this->delete('/api/users/'.$user->getKey())
+        ->assertNoContent();
+});
+
+it('cannot delete itself', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $this->delete('/api/users/'.$user->getKey())
+        ->assertForbidden();
+});
+
+it('cannot delete a admin', function () {
+    $user = User::factory()->create(['is_admin' => true]);
+    $this->delete('/api/users/'.$user->getKey())
+        ->assertForbidden();
+});
+
+it('can update a user', function () {
+    $user = User::factory()->create();
+    $this->put('/api/users/'.$user->getKey(), [
+        'first_name' => 'Updated ',
+        'last_name' => $user->last_name,
+        'email' => $user->email,
+        'username' => $user->username,
+        'birthday' => $user->birthday,
+        'mobile' => $user->mobile,
+    ])->assertOk()
+        ->assertJsonPath('data.first_name', 'Updated');
+});
+
 it('cannot update the username to a existing one', function () {
     $userName = 'CFPEnergy';
     User::factory()->create(['username' => $userName]);

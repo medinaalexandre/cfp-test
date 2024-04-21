@@ -26,6 +26,7 @@ The main function of this application is to manage the user personal data and cr
 - [Laravel Sanctum](https://laravel.com/docs/10.x/sanctum): Authentication
 - [Laravel Pint](https://laravel.com/docs/10.x/pint): Code format
 - [Pest PHP](https://pestphp.com/): Write test
+- [Laravel IDE Helper](https://github.com/barryvdh/laravel-ide-helper): IDE Helper Generator for Laravel
 - [PostgreSQL](https://www.postgresql.org/): Relational Database
 
 
