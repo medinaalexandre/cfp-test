@@ -124,14 +124,20 @@ const UserView = () => {
         <Box
             sx={{
                 height: '100dvh',
-                px: 4,
+                px: {
+                    xs: 1.5,
+                    sm: 4,
+                },
                 py: 4,
                 display: 'flex',
+                flexWrap: 'wrap',
                 flexDirection: 'column',
                 gap: 1,
             }}
         >
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box
+                sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}
+            >
                 <Breadcrumbs
                     size="sm"
                     separator={<ChevronRightRoundedIcon />}
@@ -163,13 +169,13 @@ const UserView = () => {
                     borderRadius: 'sm',
                     p: 4,
                     mt: 2,
-                    w: '100%',
+                    width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'flex-end',
                 }}
             >
-                <Stack direction="row" gap={4} sx={{}}>
+                <Stack direction="row" gap={4} flexWrap="wrap">
                     <div>
                         <Typography level="title-lg" sx={{ mb: 2 }}>
                             About <AccountBox />
@@ -227,25 +233,34 @@ const UserView = () => {
                         </Stack>
                     </div>
                 </Stack>
-                <div>
-                    <Button
-                        sx={{ mt: 2 }}
-                        component={ReactRouterLink}
-                        to="/users"
-                        variant="outlined"
-                        startDecorator={<NavigateBefore />}
-                    >
-                        Back to the list
-                    </Button>
-                    <Button
-                        variant="soft"
-                        startDecorator={<AddModerator />}
-                        sx={{ ml: 2, minWidth: 159 }}
-                        onClick={() => setIsAddRoleModalOpen(true)}
-                    >
-                        Add role
-                    </Button>
-                </div>
+                <Stack
+                    direction="row"
+                    sx={{ mt: 2 }}
+                    gap={2}
+                    flexWrap="wrap"
+                    justifyContent="flex-end"
+                >
+                    <div>
+                        <Button
+                            component={ReactRouterLink}
+                            to="/users"
+                            variant="outlined"
+                            startDecorator={<NavigateBefore />}
+                        >
+                            Back to the list
+                        </Button>
+                    </div>
+                    <div>
+                        <Button
+                            variant="soft"
+                            startDecorator={<AddModerator />}
+                            sx={{ minWidth: 159 }}
+                            onClick={() => setIsAddRoleModalOpen(true)}
+                        >
+                            Add role
+                        </Button>
+                    </div>
+                </Stack>
             </Sheet>
             <Modal
                 open={!!roleToDelete}

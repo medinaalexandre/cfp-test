@@ -92,7 +92,7 @@ const Users = () => {
 
     const fetchData = async () => await User.list(debouncedParamsValue);
     const { isLoading, data } = useQuery({
-        queryKey: ['orders', debouncedParamsValue],
+        queryKey: ['users', debouncedParamsValue],
         queryFn: fetchData,
         staleTime: 20 * 1000,
     });
@@ -119,7 +119,7 @@ const Users = () => {
         },
         onSuccess: async (_, variables) => {
             const prevData: UserListResponse | undefined =
-                queryClient.getQueryData(['orders', debouncedParamsValue]);
+                queryClient.getQueryData(['users', debouncedParamsValue]);
 
             if (!prevData) {
                 return;
@@ -134,7 +134,10 @@ const Users = () => {
                 },
             };
 
-            queryClient.setQueryData(['orders', params], updatedData);
+            queryClient.setQueryData(
+                ['users', debouncedParamsValue],
+                updatedData
+            );
         },
     });
 

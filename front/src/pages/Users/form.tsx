@@ -32,8 +32,11 @@ import { User } from '../../entities/User.ts';
 import { useSnackbar } from '../../providers/SnackbarContextProvider.tsx';
 import {
     UserCreateResponseError,
+    UserListResponse,
+    UserRequest,
     UserResource,
 } from '../../entities/User.types.ts';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const UserForm = () => {
     const [hidePassword, setHidePassword] = useState<boolean>(true);
@@ -43,6 +46,39 @@ const UserForm = () => {
     const { userId } = useParams();
     const snackbar = useSnackbar();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const isCreating = !user;
+
+    const { mutateAsync: upsertUserFn } = useMutation({
+        mutationFn: async (variables: UserRequest) => {
+            return User.upsert(variables);
+        },
+        onSuccess: async (response) => {
+            if (isCreating) {
+                queryClient.setQueryData(
+                    ['users'],
+                    (previous: UserListResponse) => {
+                        previous.data.unshift(response.data);
+                    }
+                );
+            }
+
+            queryClient.setQueriesData(
+                {
+                    queryKey: ['users'],
+                },
+                (previous: UserListResponse | undefined) => {
+                    if (!previous) {
+                        return undefined;
+                    }
+
+                    previous.data.map((user) =>
+                        user.id === response.data.id ? response.data : user
+                    );
+                }
+            );
+        },
+    });
 
     const formik = useFormik({
         initialValues: {
@@ -59,9 +95,7 @@ const UserForm = () => {
         validateOnBlur: true,
         validationSchema: UserSchema(!userId),
         onSubmit: (values) => {
-            const isCreating = !user;
-
-            User.createOrUpdate(values)
+            upsertUserFn(values)
                 .then((res) => {
                     snackbar.add({
                         text: `User ${res.data.username} ${isCreating ? 'created' : 'updated'} with successs`,
@@ -98,21 +132,13 @@ const UserForm = () => {
         const currentPassword = formik.values.password;
         let level = formik.values.password.length;
 
-        if (currentPassword.match(/[A-Z]/)) {
-            level += 12.5;
-        }
+        const patterns = [/[A-Z]/, /[a-z]/, /[0-9]/, /[!@#$%^&*()]/];
 
-        if (currentPassword.match(/[a-z]/)) {
-            level += 12.5;
-        }
-
-        if (currentPassword.match(/[0-9]/)) {
-            level += 12.5;
-        }
-
-        if (currentPassword.match(/[!@#$%^&*()]/)) {
-            level += 12.5;
-        }
+        patterns.forEach((pattern) => {
+            if (currentPassword.match(pattern)) {
+                level += 15;
+            }
+        });
 
         setPasswordSecurityLevel(Math.min(level, 100));
     }, [formik.values.password]);

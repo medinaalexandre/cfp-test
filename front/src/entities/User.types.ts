@@ -39,7 +39,7 @@ export interface UserListResponse {
     };
 }
 
-export interface UserCreateOrUpdateResponse {
+export interface UserUpsertResponse {
     data: UserResource;
 }
 
