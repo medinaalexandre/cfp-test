@@ -1,18 +1,33 @@
-name: Run test suite
-on: push
+name: Run Tests with Code Coverage
+
+on: [push, pull_request]
 
 jobs:
-  run-tests:
-    name: Run PHPUnit tests
+  test:
     runs-on: ubuntu-latest
-    container:
-      image: composer:latest
-      volumes:
-        - ${{ github.workspace }}/laravel-api/:/app
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: laravel_database
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - name: Check out the repo
+      - name: Checkout code
         uses: actions/checkout@v2
-      - name: Running composer install
-        run: composer install
-      - name: Running phpunit
-        run: ./vendor/bin/phpunit tests
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+      - name: Install dependencies
+        run: cd laravel-api && composer install
+      - name: Run PHPUnit tests with coverage
+        run: cd laravel-api && ./vendor/bin/phpunit --coverage-html coverage/
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage
+          path: laravel-api/coverage/
