@@ -110,9 +110,8 @@ it('cannot add a role that the user already have', function () {
         ->hasAttached($role)
         ->create();
 
-    $res = $this->postJson("/api/users/{$user->getKey()}/roles/add", [
+    $this->postJson("/api/users/{$user->getKey()}/roles/add", [
         'role_id' => $role->getKey(),
-    ]);
-
-    dd($res);
+    ])->assertBadRequest()
+        ->assertContent('"The user already has this role"');
 });

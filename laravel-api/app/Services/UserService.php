@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Models\Role;
 use App\Models\User;
+use DB;
 use Hash;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
+use Throwable;
 
 class UserService
 {
@@ -38,12 +40,16 @@ class UserService
 
     /**
      * @throws AuthorizationException
+     * @throws Throwable
      */
     public function delete(User $user): void
     {
         Gate::authorize('delete', $user);
 
-        $user->delete();
+        DB::transaction(function () use ($user) {
+            $user->roles()->sync([]);
+            $user->delete();
+        });
     }
 
     public function addRole(User $user, Role $role): void
