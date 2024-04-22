@@ -3,6 +3,29 @@
 # PHP Technical Test
 This test is designed for Full Stack Developers applying for a position at [CFP Energy](https://www.cfp.energy).
 
+## Sumary
+- [User management application](#user-management-application)
+  - [Requirements](#requirements)
+    - [Optional requerments](#optional-requerments)
+- [Backend](#backend)
+  - [Technology used](#technology-used)
+  - [Features](#features)
+    - [Cookie-based Session Authentication](#cookie-based-session-authentication)
+    - [Password security](#password-security)
+    - [Request validation](#request-validation)
+    - [Responses](#responses)
+    - [Invokable Controllers](#invokable-controllers)
+    - [Migrations](#migrations)
+    - [Tests](#tests)
+- [Frontend](#frontend)
+  - [Technology used](#technology-used-1)
+  - [Features](#features-1)
+    - [Single Page Application (SPA)](#single-page-application-spa)
+    - [Authentication](#authentication)
+    - [HTTP State](#http-state)
+    - [Responsive design](#responsive-design)
+    - [Dark mode](#dark-mode)
+
 ## User management application
 The main function of this application is to manage the user personal data and credentials
 
@@ -13,7 +36,7 @@ The main function of this application is to manage the user personal data and cr
 - [x] Front end using React
   - You can check out the source code in [front](./front)
 
-### Optional requerments
+#### Optional requerments
 - [x] tests in the backend
 - [x] early returns
 - [x] docker
@@ -21,7 +44,7 @@ The main function of this application is to manage the user personal data and cr
 - [x] conventional commits
 ---
 # Backend
-## Technology used:
+## Technology used
 - [Laravel](https://laravel.com/): Web application Framework
 - [Laravel Sanctum](https://laravel.com/docs/10.x/sanctum): Authentication
 - [Laravel Pint](https://laravel.com/docs/10.x/pint): Code format
