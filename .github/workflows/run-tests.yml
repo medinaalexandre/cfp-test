@@ -11,21 +11,27 @@ jobs:
         env:
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: laravel_database
+          POSTGRES_DB: testing_database
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
-      - name: Install dependencies
-        run: cd laravel-api && composer install
+          php-version: '8.2'
+      - name: Copy .env
+        run: cd laravel-api && php -r "file_exists('.env') || copy('.env.ci', '.env');"
+      - name: Install Dependencies
+        run: cd laravel-api && composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Generate key
+        run: cd laravel-api && php artisan key:generate
+      - name: Directory Permissions
+        run: cd laravel-api && chmod -R 777 storage bootstrap/cache
       - name: Run PHPUnit tests with coverage
-        run: cd laravel-api && ./vendor/bin/phpunit --coverage-html coverage/
+        run: cd laravel-api && php artisan test --coverage-html coverage/
       - name: Upload coverage report
         uses: actions/upload-artifact@v2
         with:

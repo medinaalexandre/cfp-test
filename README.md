@@ -1,7 +1,8 @@
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
-
 # PHP Technical Test
 This test is designed for Full Stack Developers applying for a position at [CFP Energy](https://www.cfp.energy).
+
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
+[![run-tests](https://github.com/medinaalexandre/cfp-test/actions/workflows/run-tests.yml/badge.svg)](https://github.com/medinaalexandre/cfp-test/actions/workflows/run-tests.yml)
 
 ## Sumary
 - [User management application](#user-management-application)
