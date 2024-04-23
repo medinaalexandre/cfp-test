@@ -8,6 +8,7 @@ This test is designed for Full Stack Developers applying for a position at [CFP 
 - [User management application](#user-management-application)
   - [Requirements](#requirements)
     - [Optional requerments](#optional-requerments)
+- [Running locally](#running-locally)
 - [Backend](#backend)
   - [Technology used](#technology-used)
   - [Features](#features)
@@ -43,6 +44,42 @@ The main function of this application is to manage the user personal data and cr
 - [x] docker
 - [x] commit process regularly
 - [x] conventional commits
+
+## Running locally
+Clone the repository:
+```shell
+git clone git@github.com:medinaalexandre/cfp-test.git
+```
+Navigate to the Laravel API directory:
+```shell
+cd cfp-test/laravel-api
+```` 
+Set permissions for the storage directory:
+```shell
+sudo chmod 777 -R storage/
+```
+Build the Docker containers:
+```shell
+docker-compose up --build -d
+```
+Generate the app key, run migrations, and seed the database:
+```shell
+docker exec -i php_cfp_test php artisan key:generate && docker exec -i php_cfp_test php artisan migrate:fresh --seed
+```
+Navigate to the frontend directory:
+```shell
+cd ../front
+```
+Install packages and run the development server:
+```shell
+yarn && yarn dev
+```
+### Accessing the Application
+Once the setup is complete, access the application in your browser at `localhost:5473`.
+Log in with the following credentials:
+
+- Username: admin@cfp.com
+- Password: P@ssword123!
 ---
 # Backend
 ## Technology used
