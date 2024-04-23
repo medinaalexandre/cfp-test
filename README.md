@@ -66,16 +66,9 @@ Generate the app key, run migrations, and seed the database:
 ```shell
 docker exec -i php_cfp_test php artisan key:generate && docker exec -i php_cfp_test php artisan migrate:fresh --seed
 ```
-Navigate to the frontend directory:
-```shell
-cd ../front
-```
-Install packages and run the development server:
-```shell
-yarn && yarn dev
-```
+
 ### Accessing the Application
-Once the setup is complete, access the application in your browser at `localhost:5473`.
+Once the setup is complete, access the application in your browser at `localhost:5173`.
 Log in with the following credentials:
 
 - Username: admin@cfp.com

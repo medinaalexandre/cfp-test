@@ -41,6 +41,19 @@ services:
         networks:
             - cfp-network
 
+    node:
+        build: ./docker/node
+        container_name: node_cfp_test
+        ports:
+            - '5173:5173'
+        volumes:
+            - ../front/:/var/www/app/
+        working_dir: /var/www/app
+        networks:
+            - cfp-network
+        extra_hosts:
+            - host.docker.internal:host-gateway
+
 networks:
     cfp-network:
         driver: bridge
