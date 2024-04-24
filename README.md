@@ -58,13 +58,17 @@ Set permissions for the storage directory:
 ```shell
 sudo chmod 777 -R storage/
 ```
+Copy the env example:
+```shell
+cp .env.example .env
+```
 Build the Docker containers:
 ```shell
-docker-compose up --build -d
+docker compose up --build -d
 ```
-Generate the app key, run migrations, and seed the database:
+Install dependencies, generate app key, run migrations, and seed the database:
 ```shell
-docker exec -i php_cfp_test php artisan key:generate && docker exec -i php_cfp_test php artisan migrate:fresh --seed
+docker exec -i php_cfp_test composer install && docker exec -i php_cfp_test php artisan key:generate && docker exec -i php_cfp_test php artisan migrate:fresh --seed
 ```
 
 ### Accessing the Application
