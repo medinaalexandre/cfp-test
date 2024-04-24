@@ -7,7 +7,7 @@ This test is designed for Full Stack Developers applying for a position at [CFP 
 ## Sumary
 - [User management application](#user-management-application)
   - [Requirements](#requirements)
-    - [Optional requerments](#optional-requerments)
+    - [Optional requirements](#optional-requirements)
 - [Running locally](#running-locally)
 - [Backend](#backend)
   - [Technology used](#technology-used)
@@ -38,7 +38,7 @@ The main function of this application is to manage the user personal data and cr
 - [x] Front end using React
   - You can check out the source code in [front](./front)
 
-#### Optional requerments
+#### Optional requirements
 - [x] tests in the backend
 - [x] early returns
 - [x] docker
